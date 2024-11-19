@@ -1,0 +1,7 @@
+#! /usr/local/bin/bash
+
+creds=$(cat ~/.skybluerc)
+session=$(curl -s -X POST https://bsky.social/xrpc/com.atproto.server.createSession -H "Content-Type: application/json" -d "$creds")
+accessJwt=$(echo $session | jq .accessJwt | sed 's/"//g')
+
+curl -s -X GET 'https://bsky.social/xrpc/app.bsky.feed.getTimeline?limit=10' -H "Authorization: Bearer $accessJwt" | jq .
