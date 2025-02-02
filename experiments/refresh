@@ -1,0 +1,12 @@
+#! /usr/local/bin/bash
+
+creds=$(cat ~/.skybluerc)
+session=$(curl -s -X POST https://bsky.social/xrpc/com.atproto.server.createSession -H "Content-Type: application/json" -d "$creds")
+accessJwt=$(echo $session | jq .accessJwt | sed 's/"//g')
+refreshJwt=$(echo $session | jq .refreshJwt | sed 's/"//g')
+
+echo $accessJwt
+echo $refreshJwt
+
+# note that accessJwt & refreshJwt are different after the refresh
+curl -s -X POST 'https://bsky.social/xrpc/com.atproto.server.refreshSession' -H "Authorization: Bearer $refreshJwt" | jq .
