@@ -24,6 +24,32 @@ class Server:
         body = json.loads(response.read())
         self.accessJwt = body["accessJwt"]
         self.refreshJwt = body["refreshJwt"]
+        self.did = body["did"]
+        self.handle = body["handle"]
+
+    def getPreferences(self):
+        self.conn.request(
+            "GET",
+            "/xrpc/app.bsky.actor.getPreferences",
+            headers={"Authorization": f"Bearer {self.accessJwt}"},
+        )
+        response = self.conn.getresponse()
+        print(response.status, response.reason)
+        assert response.status == 200, response.reason
+        result = json.loads(response.read())
+        return result
+
+    def getSelfAuthorFeed(self, limit=10):
+        self.conn.request(
+            "GET",
+            f"/xrpc/app.bsky.feed.getAuthorFeed?actor={self.did}&limit={limit}",
+            headers={"Authorization": f"Bearer {self.accessJwt}"},
+        )
+        response = self.conn.getresponse()
+        print(response.status, response.reason)
+        assert response.status == 200, response.reason
+        result = json.loads(response.read())
+        return result
 
     def getTimeline(self, limit=10):
         args = {"limit": limit}
