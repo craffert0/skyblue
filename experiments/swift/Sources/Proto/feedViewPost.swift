@@ -37,7 +37,7 @@ public class profileAssociatedChat: Codable {
 
 public class knownFollowers: Codable {
     public let count: Int
-    public let followers: [atproto.app.bsky.actor.profileViewBasic]
+    public let followers: [app.bsky.actor.profileViewBasic]
 }
 
 public class listViewBasic: Codable {

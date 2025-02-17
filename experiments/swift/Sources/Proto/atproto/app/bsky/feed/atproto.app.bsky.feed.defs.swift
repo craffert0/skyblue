@@ -1,4 +1,4 @@
-extension atproto.app.bsky.feed {
+extension app.bsky.feed {
     public class feedViewPost: Codable {
         // enum reasonEnum: String, Codable {
         //     case reasonRepost reasonPin
@@ -15,7 +15,7 @@ extension atproto.app.bsky.feed {
         public let uri: String // format: at-uri
         public let cid: String // format: cid
         // NOTE: fully-qualified different namespace
-        public let author: atproto.app.bsky.actor.profileViewBasic
+        public let author: app.bsky.actor.profileViewBasic
         // record: Any
         public let indexedAt: String // format: datetime
 
@@ -33,7 +33,7 @@ extension atproto.app.bsky.feed {
 }
 
 // NOTE: two different viewerState in two different namespaces works nicely
-extension atproto.app.bsky.feed {
+extension app.bsky.feed {
     public class viewerState: Codable {
         public let repost: String? // format": "at-uri" },
         public let like: String? // "format": "at-uri" },

@@ -1,6 +1,6 @@
-extension atproto.app.bsky.actor {
+extension app.bsky.actor {
     public class getPreferencesResult: Codable {
-        public let preferences: [atproto.app.bsky.actor.preference]
+        public let preferences: [app.bsky.actor.preference]
     }
 
     public enum preference: Codable {
@@ -143,7 +143,7 @@ extension atproto.app.bsky.actor {
     }
 }
 
-extension atproto.app.bsky.actor {
+extension app.bsky.actor {
     public class profileViewBasic: Codable {
         public let did: String // format: did
         public let handle: String // format: handle
@@ -159,7 +159,7 @@ extension atproto.app.bsky.actor {
 }
 
 // NOTE: two different viewerState in two different namespaces works nicely
-extension atproto.app.bsky.actor {
+extension app.bsky.actor {
     public class viewerState: Codable {
         public let muted: Bool?
         public let mutedByList: listViewBasic?

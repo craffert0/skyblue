@@ -59,7 +59,7 @@ struct Session: Codable {
         if response.statusCode != .ok {
             return
         }
-        let result = try response.decode(Proto.atproto.app.bsky.actor.getPreferencesResult.self)
+        let result = try response.decode(Proto.app.bsky.actor.getPreferencesResult.self)
         try Proto.json_dump(result)
     }
 
@@ -79,7 +79,7 @@ struct Session: Codable {
         if response.statusCode != .ok {
             return
         }
-        let result = try response.decode(Proto.atproto.app.bsky.feed.GetTimeline.Output.self)
+        let result = try response.decode(Proto.app.bsky.feed.GetTimeline.Output.self)
         cursor = result.cursor
         try Proto.json_dump(result)
     }
@@ -98,7 +98,7 @@ struct Session: Codable {
         if response.statusCode != .ok {
             return
         }
-        let result = try response.decode(Proto.atproto.app.bsky.feed.GetTimeline.Output.self)
+        let result = try response.decode(Proto.app.bsky.feed.GetTimeline.Output.self)
         try Proto.json_dump(result)
     }
 }

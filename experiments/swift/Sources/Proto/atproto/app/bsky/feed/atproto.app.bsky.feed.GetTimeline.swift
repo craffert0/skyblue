@@ -1,5 +1,5 @@
 // lexicons/app/bsky/feed/getTimeline.json
-extension atproto.app.bsky.feed {
+extension app.bsky.feed {
     public struct GetTimeline {
         public class Output: Codable {
             public let cursor: String
