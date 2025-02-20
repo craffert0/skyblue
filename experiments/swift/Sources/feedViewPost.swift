@@ -1,30 +1,48 @@
-class feedViewPost: Codable {
-    // enum reasonEnum: String, Codable {
-    //     case reasonRepost reasonPin
-    // }
+// The basic idea for namespacing is to define the entire set of namespaces in
+// a nested enum up front. Then each json object is in an extension of the
+// fully qualified enum.
 
-    let post: postView
-    // reply: replyRef?
-    // reason: reasonEnum?
-    let feedContext: String?
+enum atproto {
+    enum app {
+        enum bsky {
+            enum actor {}
+            enum feed {}
+        }
+    }
 }
 
-class postView: Codable {
-    let uri: String // format: at-uri
-    let cid: String // format: cid
-    let author: profileViewBasic
-    // record: Any
-    let indexedAt: String // format: datetime
+extension atproto.app.bsky.feed {
+    class feedViewPost: Codable {
+        // enum reasonEnum: String, Codable {
+        //     case reasonRepost reasonPin
+        // }
 
-    // embed: Any?
+        // NOTE: no need to qualify namespace since it's the same
+        let post: postView
+        // reply: replyRef?
+        // reason: reasonEnum?
+        let feedContext: String?
+    }
 
-    let replyCount: Int?
-    let repostCount: Int?
-    let likeCount: Int?
-    let quoteCount: Int?
-    let viewer: feed_viewerState?
-    let labels: [label]?
-    let threadgate: threadgateView?
+    class postView: Codable {
+        let uri: String // format: at-uri
+        let cid: String // format: cid
+        // NOTE: fully-qualified different namespace
+        let author: atproto.app.bsky.actor.profileViewBasic
+        // record: Any
+        let indexedAt: String // format: datetime
+
+        // embed: Any?
+
+        let replyCount: Int?
+        let repostCount: Int?
+        let likeCount: Int?
+        let quoteCount: Int?
+        // NOTE: viewerState is in both .feed and .actor, but we're namespaced
+        let viewer: viewerState?
+        let labels: [label]?
+        let threadgate: threadgateView?
+    }
 }
 
 class threadgateView: Codable {
@@ -46,16 +64,19 @@ class threadgateView: Codable {
 
 // }
 
-class profileViewBasic: Codable {
-    let did: String // format: did
-    let handle: String // format: handle
+extension atproto.app.bsky.actor {
+    class profileViewBasic: Codable {
+        let did: String // format: did
+        let handle: String // format: handle
 
-    let displayName: String?
-    // let avatar: String?             // format: uri
-    let associated: profileAssociated?
-    let viewer: actor_viewerState?
-    let labels: [label]?
-    let createdAt: String?          // format: datetime
+        let displayName: String?
+        // let avatar: String?             // format: uri
+        let associated: profileAssociated?
+        // NOTE: viewerState is in both .feed and .actor, but we're namespaced
+        let viewer: viewerState?
+        let labels: [label]?
+        let createdAt: String? // format: datetime
+    }
 }
 
 class profileAssociated: Codable {
@@ -74,29 +95,34 @@ class profileAssociatedChat: Codable {
     let allowIncoming: allowIncomingEnum
 }
 
-class actor_viewerState: Codable {
-    let muted: Bool?
-    let mutedByList: listViewBasic?
-    let blockedBy: Bool?
-    let blocking: String? // format": "at-uri" },
-    let blockingByList: listViewBasic?
-    let following: String? // "format": "at-uri" },
-    let followedBy: String? // "format": "at-uri" },
-    let knownFollowers: knownFollowers?
+// NOTE: two different viewerState in two different namespaces works nicely
+extension atproto.app.bsky.actor {
+    class viewerState: Codable {
+        let muted: Bool?
+        let mutedByList: listViewBasic?
+        let blockedBy: Bool?
+        let blocking: String? // format": "at-uri" },
+        let blockingByList: listViewBasic?
+        let following: String? // "format": "at-uri" },
+        let followedBy: String? // "format": "at-uri" },
+        let knownFollowers: knownFollowers?
+    }
 }
 
-class feed_viewerState: Codable {
-    let repost: String?         // format": "at-uri" },
-    let like: String?           // "format": "at-uri" },
-    let threadMuted: Bool?
-    let replyDisabled: Bool?
-    let embeddingDisabled: Bool?
-    let pinned: Bool?
+extension atproto.app.bsky.feed {
+    class viewerState: Codable {
+        let repost: String? // format": "at-uri" },
+        let like: String? // "format": "at-uri" },
+        let threadMuted: Bool?
+        let replyDisabled: Bool?
+        let embeddingDisabled: Bool?
+        let pinned: Bool?
+    }
 }
 
 class knownFollowers: Codable {
     let count: Int
-    let followers: [profileViewBasic]
+    let followers: [atproto.app.bsky.actor.profileViewBasic]
 }
 
 class listViewBasic: Codable {
