@@ -21,5 +21,9 @@ let package = Package(
                 .product(name: "RealHTTP", package: "realhttp"),
             ]
         ),
+        .testTarget(
+            name: "tests",
+            dependencies: ["top10"]
+        ),
     ]
 )
