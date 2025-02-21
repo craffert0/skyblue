@@ -47,6 +47,21 @@ struct Session: Codable {
         refreshJwt = new_session.refreshJwt
     }
 
+    func printPreferences() async throws {
+        let request = HTTPRequest {
+            $0.url = "https://bsky.social/xrpc/app.bsky.actor.getPreferences"
+            $0.method = .get
+            $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
+        }
+        let response = try await request.fetch()
+        print("DEBUG headers", response.headers)
+        if response.statusCode != .ok {
+            return
+        }
+        let result = try response.decode(atproto.app.bsky.actor.getPreferencesResult.self)
+        try dump_json(result)
+    }
+
     mutating func printTimeline(limit: Int = 10) async throws {
         let request = HTTPRequest {
             $0.url = "https://bsky.social/xrpc/app.bsky.feed.getTimeline"
