@@ -1,5 +1,6 @@
 import Foundation
 import RealHTTP
+import Proto
 
 struct Session: Codable {
     var accessJwt: String
@@ -28,7 +29,7 @@ struct Session: Codable {
         }
         print("DEBUG headers", response.headers)
         self = try response.decode(Session.self)
-        try dump_json(self)
+        try Proto.json_dump(self)
     }
 
     mutating func refresh() async throws {
@@ -58,8 +59,8 @@ struct Session: Codable {
         if response.statusCode != .ok {
             return
         }
-        let result = try response.decode(atproto.app.bsky.actor.getPreferencesResult.self)
-        try dump_json(result)
+        let result = try response.decode(Proto.atproto.app.bsky.actor.getPreferencesResult.self)
+        try Proto.json_dump(result)
     }
 
     mutating func printTimeline(limit: Int = 10) async throws {
@@ -78,9 +79,9 @@ struct Session: Codable {
         if response.statusCode != .ok {
             return
         }
-        let result = try response.decode(getTimelineResult.self)
+        let result = try response.decode(Proto.atproto.app.bsky.feed.GetTimeline.Output.self)
         cursor = result.cursor
-        try dump_json(result)
+        try Proto.json_dump(result)
     }
 
     func printSelfAuthorFeed(limit: Int = 10) async throws {
@@ -97,14 +98,7 @@ struct Session: Codable {
         if response.statusCode != .ok {
             return
         }
-        let result = try response.decode(getTimelineResult.self)
-        try dump_json(result)
+        let result = try response.decode(Proto.atproto.app.bsky.feed.GetTimeline.Output.self)
+        try Proto.json_dump(result)
     }
-}
-
-func dump_json(_ raw: Encodable) throws {
-    let encoder = JSONEncoder()
-    encoder.outputFormatting = .prettyPrinted
-    let data = try encoder.encode(raw)
-    print(String(data: data, encoding: .utf8)!)
 }

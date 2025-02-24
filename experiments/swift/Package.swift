@@ -8,22 +8,34 @@ let package = Package(
 
     platforms: [.macOS(.v15)],
 
+    products: [
+        .library(
+            name: "Proto",
+            targets: ["Proto"]
+        ),
+    ],
+
     dependencies: [
         .package(url: "https://github.com/immobiliare/RealHTTP.git", from: "1.9.0"),
     ],
 
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .executableTarget(
-            name: "top10",
+            name: "Main",
             dependencies: [
                 .product(name: "RealHTTP", package: "realhttp"),
+                "Proto",
             ]
         ),
         .testTarget(
-            name: "tests",
-            dependencies: ["top10"]
+            name: "MainTests",
+            dependencies: ["Main"]
+        ),
+        .target(
+            name: "Proto"),
+        .testTarget(
+            name: "ProtoTests",
+            dependencies: ["Proto"]
         ),
     ]
 )

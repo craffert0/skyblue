@@ -1,6 +1,6 @@
 import Foundation
+import Proto
 import Testing
-@testable import top10
 
 @Test func parsePrefs() throws {
     // This is from running top10.py + `print(json.dumps(server.getPreferences(), indent=2))`
@@ -385,5 +385,5 @@ import Testing
     }
     """
     let result = try! JSONDecoder().decode(atproto.app.bsky.actor.getPreferencesResult.self, from: Data(input.utf8))
-    try dump_json(result)
+    #expect(result != nil)
 }
