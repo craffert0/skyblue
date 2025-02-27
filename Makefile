@@ -3,7 +3,7 @@
 all:
 
 regen:
-	tools/codegen.py -d ../atproto/lexicons -o experiments/swift/Sources/Proto/generated
+	cd codegen ; swift run codegen ../../atproto/lexicons ../experiments/swift/Sources/Proto/generated
 
 lint:
 	tools/reformat.py

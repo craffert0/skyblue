@@ -45,7 +45,7 @@ struct Session {
         refreshJwt = new_session.refreshJwt
     }
 
-    func getPreferences() async throws -> Proto.app.bsky.actor.GetPreferences.Result? {
+    func getPreferences() async throws -> Response<Proto.app.bsky.actor.GetPreferences.Result> {
         let request = HTTPRequest {
             $0.url = "https://bsky.social/xrpc/app.bsky.actor.getPreferences"
             $0.method = .get
@@ -55,13 +55,10 @@ struct Session {
         if verbose {
             print("DEBUG headers", response.headers)
         }
-        guard response.statusCode == .ok else {
-            return nil
-        }
-        return try response.decode(Proto.app.bsky.actor.GetPreferences.Result.self)
+        return try response.decodeResponse(Proto.app.bsky.actor.GetPreferences.Result.self)
     }
 
-    mutating func getTimeline(limit: Int = 10) async throws -> Proto.app.bsky.feed.GetTimeline.Result? {
+    mutating func getTimeline(limit: Int = 10) async throws -> Response<Proto.app.bsky.feed.GetTimeline.Result> {
         let request = HTTPRequest {
             $0.url = "https://bsky.social/xrpc/app.bsky.feed.getTimeline"
             $0.method = .get
@@ -76,15 +73,14 @@ struct Session {
         if verbose {
             print("DEBUG headers", response.headers)
         }
-        guard response.statusCode == .ok else {
-            return nil
+        let result = try response.decodeResponse(Proto.app.bsky.feed.GetTimeline.Result.self)
+        if case let .value(tl) = result {
+            cursor = tl.cursor
         }
-        let result = try response.decode(Proto.app.bsky.feed.GetTimeline.Result.self)
-        cursor = result.cursor
         return result
     }
 
-    func getSelfAuthorFeed(limit: Int = 10) async throws -> Proto.app.bsky.feed.GetAuthorFeed.Result? {
+    func getSelfAuthorFeed(limit: Int = 10) async throws -> Response<Proto.app.bsky.feed.GetAuthorFeed.Result> {
         let request = HTTPRequest {
             $0.url = "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed"
             $0.method = .get
@@ -97,9 +93,6 @@ struct Session {
         if verbose {
             print("DEBUG headers", response.headers)
         }
-        guard response.statusCode == .ok else {
-            return nil
-        }
-        return try response.decode(Proto.app.bsky.feed.GetAuthorFeed.Result.self)
+        return try response.decodeResponse(Proto.app.bsky.feed.GetAuthorFeed.Result.self)
     }
 }

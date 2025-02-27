@@ -48,10 +48,3 @@ public enum tools {
         public enum team {}
     }
 }
-
-// TODO: remove these when I implement these
-public struct Unknown_blob: Codable {}
-public struct Unknown_bytes: Codable {}
-public struct Unknown_cid_link: Codable {}
-public struct Unknown_union: Codable {}
-public struct Unknown_unknown: Codable {}
