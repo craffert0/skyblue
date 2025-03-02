@@ -36,12 +36,12 @@ enum AnyPet: Codable, Equatable {
     case unknown
 
     init(from decoder: Decoder) throws {
-        let typename = try? decoder.singleValueContainer().decode(TypeName.self).typename
-        if typename == "cat" {
+        switch try? decoder.singleValueContainer().decode(TypeName.self).typename {
+        case "cat":
             self = try .cat(decoder.singleValueContainer().decode(Cat.self))
-        } else if typename == "bird" {
+        case "bird":
             self = try .bird(decoder.singleValueContainer().decode(Bird.self))
-        } else {
+        default:
             self = .unknown
         }
     }
