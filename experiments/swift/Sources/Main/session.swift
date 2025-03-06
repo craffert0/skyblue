@@ -17,9 +17,10 @@ struct Session: Codable {
     // let active: Bool?
     // let status: String?
 
+    var verbose: Bool?
     var cursor: String?
 
-    init?(with creds: Credentials) async throws {
+    init?(with creds: Credentials, verbose: Bool) async throws {
         let response =
             try await HTTPRequest(method: .post,
                                   "https://bsky.social/xrpc/com.atproto.server.createSession",
@@ -27,8 +28,11 @@ struct Session: Codable {
         if response.statusCode != .ok {
             return nil
         }
-        print("DEBUG headers", response.headers)
+        if verbose {
+            print("DEBUG headers", response.headers)
+        }
         self = try response.decode(Session.self)
+        self.verbose = verbose
     }
 
     mutating func refresh() async throws {
@@ -38,7 +42,9 @@ struct Session: Codable {
             $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + refreshJwt))
         }
         let response = try await request.fetch()
-        print("DEBUG headers", response.headers)
+        if verbose! {
+            print("DEBUG headers", response.headers)
+        }
         if response.statusCode != .ok {
             return
         }
@@ -54,7 +60,9 @@ struct Session: Codable {
             $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
         }
         let response = try await request.fetch()
-        print("DEBUG headers", response.headers)
+        if verbose! {
+            print("DEBUG headers", response.headers)
+        }
         guard response.statusCode == .ok else {
             return nil
         }
@@ -73,7 +81,9 @@ struct Session: Codable {
         }
 
         let response = try await request.fetch()
-        print("DEBUG headers", response.headers)
+        if verbose! {
+            print("DEBUG headers", response.headers)
+        }
         guard response.statusCode == .ok else {
             return nil
         }
@@ -92,7 +102,9 @@ struct Session: Codable {
         }
 
         let response = try await request.fetch()
-        print("DEBUG headers", response.headers)
+        if verbose! {
+            print("DEBUG headers", response.headers)
+        }
         guard response.statusCode == .ok else {
             return nil
         }
