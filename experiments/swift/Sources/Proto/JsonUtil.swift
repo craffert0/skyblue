@@ -1,8 +1,10 @@
 import Foundation
 
-public func json_dump(_ raw: Encodable) throws {
-    let encoder = JSONEncoder()
-    encoder.outputFormatting = .prettyPrinted
-    let data = try encoder.encode(raw)
-    print(String(data: data, encoding: .utf8)!)
+public extension Encodable {
+    func dumpJson() throws {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let data = try encoder.encode(self)
+        print(String(data: data, encoding: .utf8)!)
+    }
 }
