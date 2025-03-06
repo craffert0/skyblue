@@ -14,7 +14,7 @@ struct Main: AsyncParsableCommand {
         @Flag(name: [.long, .customShort("v")], help: "Be verbose.")
         var verbose = false
 
-        @Argument(transform: Credentials.init(from:))
+        @Argument(transform: credentials_decode(from:))
         var creds: Credentials
 
         func session() async throws -> Session? {
@@ -29,7 +29,7 @@ struct Main: AsyncParsableCommand {
         @OptionGroup var options: Options
 
         mutating func run() async throws {
-            try await options.session()?.getSelfAuthorFeed()?.dumpJson()
+            try await options.session()?.getSelfAuthorFeed().dumpJson()
         }
     }
 
@@ -40,7 +40,7 @@ struct Main: AsyncParsableCommand {
         @OptionGroup var options: Options
 
         mutating func run() async throws {
-            try await options.session()?.getPreferences()?.dumpJson()
+            try await options.session()?.getPreferences().dumpJson()
         }
     }
 
@@ -54,11 +54,11 @@ struct Main: AsyncParsableCommand {
             guard var session = try await options.session() else {
                 return
             }
-            try await session.getTimeline()?.dumpJson()
-            try await session.getTimeline()?.dumpJson()
+            try await session.getTimeline().dumpJson()
+            try await session.getTimeline().dumpJson()
             try await session.refresh()
-            try await session.getTimeline()?.dumpJson()
-            try await session.getTimeline()?.dumpJson()
+            try await session.getTimeline().dumpJson()
+            try await session.getTimeline().dumpJson()
         }
     }
 }

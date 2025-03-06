@@ -1,9 +1,16 @@
 .PHONY: all regen lint
 
 all:
+	@echo wut?
 
-regen:
-	tools/codegen.py -d ../atproto/lexicons -o experiments/swift/Sources/Proto/generated
+CODEGEN_APP := codegen/.build/x86_64-apple-macosx/release/codegen
+CODEGEN_FILES := $(shell find codegen/Sources -type f -name '*.swift') codegen/Package.swift
+
+$(CODEGEN_APP): $(CODEGEN_FILES)
+	cd codegen ; swift build --configuration release
+
+regen: $(CODEGEN_APP)
+	$(CODEGEN_APP) ../atproto/lexicons experiments/swift/Sources/Proto/generated
 
 lint:
 	tools/reformat.py
