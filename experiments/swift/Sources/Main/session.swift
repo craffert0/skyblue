@@ -1,6 +1,6 @@
 import Foundation
-import RealHTTP
 import Proto
+import RealHTTP
 
 struct Session: Codable {
     var accessJwt: String
@@ -29,7 +29,6 @@ struct Session: Codable {
         }
         print("DEBUG headers", response.headers)
         self = try response.decode(Session.self)
-        try Proto.json_dump(self)
     }
 
     mutating func refresh() async throws {
@@ -48,7 +47,7 @@ struct Session: Codable {
         refreshJwt = new_session.refreshJwt
     }
 
-    func printPreferences() async throws {
+    func getPreferences() async throws -> Proto.app.bsky.actor.GetPreferences.Result? {
         let request = HTTPRequest {
             $0.url = "https://bsky.social/xrpc/app.bsky.actor.getPreferences"
             $0.method = .get
@@ -56,14 +55,13 @@ struct Session: Codable {
         }
         let response = try await request.fetch()
         print("DEBUG headers", response.headers)
-        if response.statusCode != .ok {
-            return
+        guard response.statusCode == .ok else {
+            return nil
         }
-        let result = try response.decode(Proto.app.bsky.actor.GetPreferences.Result.self)
-        try Proto.json_dump(result)
+        return try response.decode(Proto.app.bsky.actor.GetPreferences.Result.self)
     }
 
-    mutating func printTimeline(limit: Int = 10) async throws {
+    mutating func getTimeline(limit: Int = 10) async throws -> Proto.app.bsky.feed.GetTimeline.Result? {
         let request = HTTPRequest {
             $0.url = "https://bsky.social/xrpc/app.bsky.feed.getTimeline"
             $0.method = .get
@@ -76,15 +74,15 @@ struct Session: Codable {
 
         let response = try await request.fetch()
         print("DEBUG headers", response.headers)
-        if response.statusCode != .ok {
-            return
+        guard response.statusCode == .ok else {
+            return nil
         }
         let result = try response.decode(Proto.app.bsky.feed.GetTimeline.Result.self)
         cursor = result.cursor
-        try Proto.json_dump(result)
+        return result
     }
 
-    func printSelfAuthorFeed(limit: Int = 10) async throws {
+    func getSelfAuthorFeed(limit: Int = 10) async throws -> Proto.app.bsky.feed.GetAuthorFeed.Result? {
         let request = HTTPRequest {
             $0.url = "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed"
             $0.method = .get
@@ -95,10 +93,9 @@ struct Session: Codable {
 
         let response = try await request.fetch()
         print("DEBUG headers", response.headers)
-        if response.statusCode != .ok {
-            return
+        guard response.statusCode == .ok else {
+            return nil
         }
-        let result = try response.decode(Proto.app.bsky.feed.GetAuthorFeed.Result.self)
-        try Proto.json_dump(result)
+        return try response.decode(Proto.app.bsky.feed.GetAuthorFeed.Result.self)
     }
 }

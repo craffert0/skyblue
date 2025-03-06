@@ -1,5 +1,6 @@
 import ArgumentParser
 import Foundation
+import Proto
 
 @main
 struct Main: AsyncParsableCommand {
@@ -16,15 +17,15 @@ struct Main: AsyncParsableCommand {
 
         switch option {
         case 1:
-            try await session.printSelfAuthorFeed()
+            try await session.getSelfAuthorFeed()?.dumpJson()
         case 2:
-            try await session.printPreferences()
+            try await session.getPreferences()?.dumpJson()
         case 3:
-            try await session.printTimeline()
-            try await session.printTimeline()
+            try await session.getTimeline()?.dumpJson()
+            try await session.getTimeline()?.dumpJson()
             try await session.refresh()
-            try await session.printTimeline()
-            try await session.printTimeline()
+            try await session.getTimeline()?.dumpJson()
+            try await session.getTimeline()?.dumpJson()
         default:
             print("oops")
         }
