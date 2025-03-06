@@ -1,9 +1,9 @@
 import Foundation
+import Proto
 
-struct Credentials: Codable {
-    let identifier: String
-    let password: String
+typealias Credentials = Proto.com.atproto.server.CreateSession.Input
 
+extension Credentials {
     init(from filePath: String) throws {
         self = try JSONDecoder().decode(
             Credentials.self,

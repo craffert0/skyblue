@@ -2,25 +2,15 @@ import Foundation
 import Proto
 import RealHTTP
 
-struct Session: Codable {
+struct Session {
+    let verbose: Bool
     var accessJwt: String
     var refreshJwt: String
-    let handle: String
     let did: String
-
-    // // note that `didDoc: Any?` is not [de]codable!
-    // let didDoc: Any?
-    // // All the other optional ones
-    // let email: String?
-    // let emailConfirmed: Bool?
-    // let emailAuthFactor: Bool?
-    // let active: Bool?
-    // let status: String?
-
-    var verbose: Bool?
     var cursor: String?
 
     init?(with creds: Credentials, verbose: Bool) async throws {
+        self.verbose = verbose
         let response =
             try await HTTPRequest(method: .post,
                                   "https://bsky.social/xrpc/com.atproto.server.createSession",
@@ -31,8 +21,10 @@ struct Session: Codable {
         if verbose {
             print("DEBUG headers", response.headers)
         }
-        self = try response.decode(Session.self)
-        self.verbose = verbose
+        let login = try response.decode(Proto.com.atproto.server.CreateSession.Output.self)
+        accessJwt = login.accessJwt
+        refreshJwt = login.refreshJwt
+        did = login.did
     }
 
     mutating func refresh() async throws {
@@ -42,13 +34,13 @@ struct Session: Codable {
             $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + refreshJwt))
         }
         let response = try await request.fetch()
-        if verbose! {
+        if verbose {
             print("DEBUG headers", response.headers)
         }
         if response.statusCode != .ok {
             return
         }
-        let new_session = try response.decode(Session.self)
+        let new_session = try response.decode(Proto.com.atproto.server.RefreshSession.Output.self)
         accessJwt = new_session.accessJwt
         refreshJwt = new_session.refreshJwt
     }
@@ -60,7 +52,7 @@ struct Session: Codable {
             $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
         }
         let response = try await request.fetch()
-        if verbose! {
+        if verbose {
             print("DEBUG headers", response.headers)
         }
         guard response.statusCode == .ok else {
@@ -81,7 +73,7 @@ struct Session: Codable {
         }
 
         let response = try await request.fetch()
-        if verbose! {
+        if verbose {
             print("DEBUG headers", response.headers)
         }
         guard response.statusCode == .ok else {
@@ -102,7 +94,7 @@ struct Session: Codable {
         }
 
         let response = try await request.fetch()
-        if verbose! {
+        if verbose {
             print("DEBUG headers", response.headers)
         }
         guard response.statusCode == .ok else {
