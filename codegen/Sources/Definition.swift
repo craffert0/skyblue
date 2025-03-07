@@ -257,6 +257,7 @@ class SubscriptionDefinition: Decodable {
 
 class ObjectDefinition: Decodable {
     let required: Set<String>?
+    let nullable: Set<String>?
     let properties: [String: Property]?
 
     func emit(_ name: String, _ p: Printer) {
@@ -272,7 +273,8 @@ class ObjectDefinition: Decodable {
                          _ definitions: Definitions, _ mutable: Bool)
     {
         properties?.emit(on: p, in: class_name, with: definitions,
-                         required: required, mutable: mutable)
+                         required: required?.subtracting(nullable ?? []),
+                         mutable: mutable)
     }
 }
 
