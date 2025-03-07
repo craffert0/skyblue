@@ -79,28 +79,72 @@ class Definitions {
 
 extension [String: Property] {
     func emit(on p: Printer, in class_name: String,
-              with definitions: Definitions, required: Set<String>? = nil)
+              with definitions: Definitions, required: Set<String>? = nil,
+              mutable: Bool = false)
     {
         p.indent()
         let r = required ?? []
         for k in r.sorted() {
             definitions.add(self[k]!.emit(prop: k, in: class_name,
-                                          on: p, required: true))
+                                          on: p, mutable: mutable,
+                                          required: true))
         }
         if r.count != 0, r.count != count {
             p.newline()
         }
         for k in Set(keys).subtracting(r).sorted() {
             definitions.add(self[k]!.emit(prop: k, in: class_name,
-                                          on: p))
+                                          on: p, mutable: mutable))
         }
         p.outdent()
     }
 }
 
+class ParametersDefinition: Decodable {
+    let properties: [String: Property]?
+
+    static func emit(_ def: ParametersDefinition?, called name: String,
+                     on p: Printer, with definitions: Definitions)
+    {
+        p.println("public struct \(name): Parameters {")
+        if let properties = def?.properties {
+            // Member variables
+            properties.emit(on: p, in: name, with: definitions, mutable: true)
+
+            p.newline()
+
+            // init()
+
+            let items = properties
+                .map { (name: $0, prop: $1) }
+                .sorted { $0.name < $1.name }
+
+            p.indent()
+            p.println("public init(")
+            p.indent()
+            for (i, item) in items.enumerated() {
+                let (name, prop) = item
+                let comma = (i == items.count - 1) ? "" : ","
+                p.println("\(name): \(prop.type_name("none", name))? = nil\(comma)")
+            }
+            p.outdent()
+            p.println(") {")
+            p.indent()
+            for item in items {
+                let (name, _) = item
+                p.println("self.\(name) = \(name)")
+            }
+            p.outdent()
+            p.println("}")
+            p.outdent()
+        }
+        p.println("}")
+    }
+}
+
 class QueryDefinition: Decodable {
     let description: String?
-    let parameters: Parameters?
+    let parameters: ParametersDefinition?
     let output: Output
 
     func emit(_ name: String, _ p: Printer) {
@@ -114,22 +158,16 @@ class QueryDefinition: Decodable {
         p.println("public typealias \(class_name) = Query<\(params_name), \(result_name)>")
 
         p.newline()
-
-        p.println("public struct \(params_name): Codable {")
-        parameters?.properties?.emit(on: p, in: params_name, with: definitions)
-        p.println("}")
+        ParametersDefinition.emit(parameters, called: params_name, on: p,
+                                  with: definitions)
 
         p.newline()
 
         p.println("public struct \(result_name): Codable {")
-        output.schema?.emit_properties(p, result_name, definitions)
+        output.schema?.emit_properties(p, result_name, definitions, false)
         p.println("}")
 
         definitions.emit(p)
-    }
-
-    class Parameters: Decodable {
-        let properties: [String: Property]?
     }
 
     class Output: Decodable {
@@ -168,14 +206,14 @@ class ProcedureDefinition: Decodable {
         if let input {
             p.newline()
             p.println("public struct \(input_name): Codable {")
-            input.schema?.emit_properties(p, class_name, definitions)
+            input.schema?.emit_properties(p, class_name, definitions, true)
             p.println("}")
         }
 
         if let output {
             p.newline()
             p.println("public struct \(output_name): Codable {")
-            output.schema?.emit_properties(p, class_name, definitions)
+            output.schema?.emit_properties(p, class_name, definitions, false)
             p.println("}")
         }
 
@@ -192,7 +230,7 @@ class ProcedureDefinition: Decodable {
 }
 
 class SubscriptionDefinition: Decodable {
-    let parameters: Parameters
+    let parameters: ParametersDefinition
     let message: Message
 
     func emit(_ name: String, _ p: Printer) {
@@ -204,19 +242,12 @@ class SubscriptionDefinition: Decodable {
         p.println("public typealias \(class_name) = Subscription<\(params_name), \(message_name)>")
 
         p.newline()
-
-        p.println("public struct \(params_name): Codable {")
-        parameters.properties?.emit(on: p, in: class_name, with: definitions)
-        p.println("}")
-
+        ParametersDefinition.emit(parameters, called: params_name, on: p,
+                                  with: definitions)
         p.newline()
         message.schema.emit(message_name, p)
 
         definitions.emit(p)
-    }
-
-    class Parameters: Decodable {
-        let properties: [String: Property]?
     }
 
     class Message: Decodable {
@@ -232,16 +263,16 @@ class ObjectDefinition: Decodable {
         let definitions = Definitions()
         let class_name = to_upper(name)
         p.println("public class \(class_name): Codable {")
-        emit_properties(p, class_name, definitions)
+        emit_properties(p, class_name, definitions, false)
         p.println("}")
         definitions.emit(p)
     }
 
     func emit_properties(_ p: Printer, _ class_name: String,
-                         _ definitions: Definitions)
+                         _ definitions: Definitions, _ mutable: Bool)
     {
         properties?.emit(on: p, in: class_name, with: definitions,
-                         required: required)
+                         required: required, mutable: mutable)
     }
 }
 
@@ -257,7 +288,7 @@ class RecordDefinition: Decodable {
         }
         let class_name = to_upper(name)
         p.println("public class \(class_name): Codable {")
-        record.emit_properties(p, class_name, definitions)
+        record.emit_properties(p, class_name, definitions, false)
         p.println("}")
         definitions.emit(p)
     }

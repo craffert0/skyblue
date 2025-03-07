@@ -59,14 +59,16 @@ struct Session {
     }
 
     mutating func getTimeline(limit: Int = 10) async throws -> Response<Proto.app.bsky.feed.GetTimeline.Result> {
-        let request = HTTPRequest {
-            $0.url = "https://bsky.social/xrpc/app.bsky.feed.getTimeline"
+        typealias GetTimeline = Proto.app.bsky.feed.GetTimeline
+        var params = GetTimeline.Parameters(limit: limit)
+        if let cursor {
+            params.cursor = cursor
+        }
+        let request = try HTTPRequest {
+            $0.url = try URL(string: "https://bsky.social/xrpc/app.bsky.feed.getTimeline")?
+                .appending(queryItems: params.queryItems())
             $0.method = .get
             $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
-            $0.addQueryParameter(name: "limit", value: String(limit))
-        }
-        if let cursor {
-            request.addQueryParameter(name: "cursor", value: cursor)
         }
 
         let response = try await request.fetch()
@@ -81,12 +83,13 @@ struct Session {
     }
 
     func getSelfAuthorFeed(limit: Int = 10) async throws -> Response<Proto.app.bsky.feed.GetAuthorFeed.Result> {
-        let request = HTTPRequest {
-            $0.url = "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed"
+        typealias GetAuthorFeed = Proto.app.bsky.feed.GetAuthorFeed
+        let params = GetAuthorFeed.Parameters(actor: did, limit: limit)
+        let request = try HTTPRequest {
+            $0.url = try URL(string: "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed")?
+                .appending(queryItems: params.queryItems())
             $0.method = .get
             $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
-            $0.addQueryParameter(name: "actor", value: did)
-            $0.addQueryParameter(name: "limit", value: String(limit))
         }
 
         let response = try await request.fetch()
