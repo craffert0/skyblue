@@ -1,4 +1,4 @@
-public class Subscription<TParameters, TMessage> {
+public class ApiSubscription<TParameters, TMessage> {
     public typealias Parameters = TParameters
     public typealias Message = TMessage
 }

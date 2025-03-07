@@ -3,16 +3,16 @@ import Foundation
 import Proto
 import Testing
 
-private struct MixedParameters: Proto.Parameters {
+private struct MixedParameters: Proto.ApiParameters {
     let first: String
     let second: String?
     let third: Int
     let fourth: Int?
 }
 
-private struct NoParameters: Proto.Parameters {}
+private struct NoParameters: Proto.ApiParameters {}
 
-private struct NullableParameters: Proto.Parameters {
+private struct NullableParameters: Proto.ApiParameters {
     let first: String?
     let second: String?
 }

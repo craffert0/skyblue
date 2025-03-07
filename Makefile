@@ -1,7 +1,8 @@
 .PHONY: all regen lint
 
-all:
-	@echo wut?
+all: regen
+	cd experiments/swift ; swift test
+	cd experiments/swift ; swift build
 
 CODEGEN_APP := codegen/.build/x86_64-apple-macosx/release/codegen
 CODEGEN_FILES := $(shell find codegen/Sources -type f -name '*.swift') codegen/Package.swift

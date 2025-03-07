@@ -24,7 +24,7 @@ private enum StringOrInt: Codable {
     }
 }
 
-extension Proto.Parameters {
+extension Proto.ApiParameters {
     func queryItems() throws -> [URLQueryItem] {
         try JSONDecoder()
             .decode([String: StringOrInt].self,

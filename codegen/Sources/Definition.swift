@@ -103,13 +103,13 @@ extension [String: Property] {
 class ParametersDefinition: Decodable {
     let properties: [String: Property]?
 
-    static func emit(_ def: ParametersDefinition?, called name: String,
-                     on p: Printer, with definitions: Definitions)
+    static func emit(_ def: ParametersDefinition?, on p: Printer,
+                     with definitions: Definitions)
     {
-        p.println("public struct \(name): Parameters {")
+        p.println("public struct Parameters: ApiParameters {")
         if let properties = def?.properties {
             // Member variables
-            properties.emit(on: p, in: name, with: definitions, mutable: true)
+            properties.emit(on: p, in: "Parameters", with: definitions, mutable: true)
 
             p.newline()
 
@@ -150,21 +150,20 @@ class QueryDefinition: Decodable {
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
         let class_name = to_upper(name)
-        let params_name = class_name + "_Parameters"
-        let result_name = class_name + "_Result"
         if let description {
             p.comment(description)
         }
-        p.println("public typealias \(class_name) = Query<\(params_name), \(result_name)>")
+        p.println("public class \(class_name): ApiQuery<\(class_name).Parameters, \(class_name).Result> {")
+        p.indent()
+        ParametersDefinition.emit(parameters, on: p, with: definitions)
 
         p.newline()
-        ParametersDefinition.emit(parameters, called: params_name, on: p,
-                                  with: definitions)
 
-        p.newline()
+        p.println("public struct Result: Codable {")
+        output.schema?.emit_properties(p, "Result", definitions, false)
+        p.println("}")
 
-        p.println("public struct \(result_name): Codable {")
-        output.schema?.emit_properties(p, result_name, definitions, false)
+        p.outdent()
         p.println("}")
 
         definitions.emit(p)
@@ -183,39 +182,40 @@ class ProcedureDefinition: Decodable {
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
         let class_name = to_upper(name)
-        let input_name = class_name + "_Input"
-        let output_name = class_name + "_Output"
+        let input_name = class_name + ".Input"
+        let output_name = class_name + ".Output"
         if let description {
             p.comment(description)
         }
 
-        if input != nil {
-            if output != nil {
-                p.println("public typealias \(class_name) = Procedure11<\(input_name), \(output_name)>")
-            } else {
-                p.println("public typealias \(class_name) = Procedure10<\(input_name)>")
-            }
-        } else {
-            if output != nil {
-                p.println("public typealias \(class_name) = Procedure01<\(output_name)>")
-            } else {
-                p.println("public typealias \(class_name) = Procedure00")
-            }
+        switch (input, output) {
+        case (nil, nil):
+            p.println("public class \(class_name): ApiProcedure00 {")
+        case (_, nil):
+            p.println("public class \(class_name): ApiProcedure10<\(input_name)> {")
+        case (nil, _):
+            p.println("public class \(class_name): ApiProcedure01<\(output_name)> {")
+        default:
+            p.println("public class \(class_name): ApiProcedure11<\(input_name), \(output_name)> {")
         }
+        p.indent()
 
         if let input {
             p.newline()
-            p.println("public struct \(input_name): Codable {")
+            p.println("public struct Input: Codable {")
             input.schema?.emit_properties(p, class_name, definitions, true)
             p.println("}")
         }
 
         if let output {
             p.newline()
-            p.println("public struct \(output_name): Codable {")
+            p.println("public struct Output: Codable {")
             output.schema?.emit_properties(p, class_name, definitions, false)
             p.println("}")
         }
+
+        p.outdent()
+        p.println("}")
 
         definitions.emit(p)
     }
@@ -236,16 +236,16 @@ class SubscriptionDefinition: Decodable {
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
         let class_name = to_upper(name)
-        let params_name = class_name + "_Parameters"
-        let message_name = class_name + "_Message"
 
-        p.println("public typealias \(class_name) = Subscription<\(params_name), \(message_name)>")
+        p.println("public class \(class_name): ApiSubscription<\(class_name).Parameters, \(class_name).Message> {")
+        p.indent()
 
+        ParametersDefinition.emit(parameters, on: p, with: definitions)
         p.newline()
-        ParametersDefinition.emit(parameters, called: params_name, on: p,
-                                  with: definitions)
-        p.newline()
-        message.schema.emit(message_name, p)
+        message.schema.emit("Message", p)
+
+        p.outdent()
+        p.println("}")
 
         definitions.emit(p)
     }

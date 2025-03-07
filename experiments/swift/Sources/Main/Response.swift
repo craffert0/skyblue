@@ -5,7 +5,7 @@ extension HTTPStatusCode: @retroactive Encodable {}
 
 enum Response<Type: Encodable>: Encodable {
     case value(Type)
-    case error(HTTPStatusCode, Proto.HttpError)
+    case error(HTTPStatusCode, Proto.ApiError)
 }
 
 extension HTTPResponse {
@@ -14,7 +14,7 @@ extension HTTPResponse {
         case .ok:
             try .value(decode(type))
         default:
-            try .error(statusCode, decode(Proto.HttpError.self))
+            try .error(statusCode, decode(Proto.ApiError.self))
         }
     }
 }
