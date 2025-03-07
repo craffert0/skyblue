@@ -79,20 +79,22 @@ class Definitions {
 
 extension [String: Property] {
     func emit(on p: Printer, in class_name: String,
-              with definitions: Definitions, required: Set<String>? = nil)
+              with definitions: Definitions, required: Set<String>? = nil,
+              mutable: Bool = false)
     {
         p.indent()
         let r = required ?? []
         for k in r.sorted() {
             definitions.add(self[k]!.emit(prop: k, in: class_name,
-                                          on: p, required: true))
+                                          on: p, mutable: mutable,
+                                          required: true))
         }
         if r.count != 0, r.count != count {
             p.newline()
         }
         for k in Set(keys).subtracting(r).sorted() {
             definitions.add(self[k]!.emit(prop: k, in: class_name,
-                                          on: p))
+                                          on: p, mutable: mutable))
         }
         p.outdent()
     }
@@ -115,14 +117,15 @@ class QueryDefinition: Decodable {
 
         p.newline()
 
-        p.println("public struct \(params_name): Codable {")
-        parameters?.properties?.emit(on: p, in: params_name, with: definitions)
+        p.println("public struct \(params_name): Parameters {")
+        parameters?.properties?.emit(on: p, in: params_name, with: definitions,
+                                     mutable: true)
         p.println("}")
 
         p.newline()
 
         p.println("public struct \(result_name): Codable {")
-        output.schema?.emit_properties(p, result_name, definitions)
+        output.schema?.emit_properties(p, result_name, definitions, false)
         p.println("}")
 
         definitions.emit(p)
@@ -168,14 +171,14 @@ class ProcedureDefinition: Decodable {
         if let input {
             p.newline()
             p.println("public struct \(input_name): Codable {")
-            input.schema?.emit_properties(p, class_name, definitions)
+            input.schema?.emit_properties(p, class_name, definitions, true)
             p.println("}")
         }
 
         if let output {
             p.newline()
             p.println("public struct \(output_name): Codable {")
-            output.schema?.emit_properties(p, class_name, definitions)
+            output.schema?.emit_properties(p, class_name, definitions, false)
             p.println("}")
         }
 
@@ -205,8 +208,9 @@ class SubscriptionDefinition: Decodable {
 
         p.newline()
 
-        p.println("public struct \(params_name): Codable {")
-        parameters.properties?.emit(on: p, in: class_name, with: definitions)
+        p.println("public struct \(params_name): Parameters {")
+        parameters.properties?.emit(on: p, in: class_name, with: definitions,
+                                    mutable: true)
         p.println("}")
 
         p.newline()
@@ -232,16 +236,16 @@ class ObjectDefinition: Decodable {
         let definitions = Definitions()
         let class_name = to_upper(name)
         p.println("public class \(class_name): Codable {")
-        emit_properties(p, class_name, definitions)
+        emit_properties(p, class_name, definitions, false)
         p.println("}")
         definitions.emit(p)
     }
 
     func emit_properties(_ p: Printer, _ class_name: String,
-                         _ definitions: Definitions)
+                         _ definitions: Definitions, _ mutable: Bool)
     {
         properties?.emit(on: p, in: class_name, with: definitions,
-                         required: required)
+                         required: required, mutable: mutable)
     }
 }
 
@@ -257,7 +261,7 @@ class RecordDefinition: Decodable {
         }
         let class_name = to_upper(name)
         p.println("public class \(class_name): Codable {")
-        record.emit_properties(p, class_name, definitions)
+        record.emit_properties(p, class_name, definitions, false)
         p.println("}")
         definitions.emit(p)
     }

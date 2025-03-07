@@ -40,14 +40,14 @@ enum Property: Decodable {
     }
 
     func emit(prop prop_name: String, in class_name: String, on p: Printer,
-              required: Bool = false) -> (name: String,
-                                          definition: Definition)?
+              mutable: Bool, required: Bool = false) -> (name: String,
+                                                         definition: Definition)?
     {
         if let description {
             p.comment(description)
         }
         let type_name = type_name(class_name, prop_name)
-        p.println("public let \(prop_name): \(type_name)\(required ? "" : "?")")
+        p.println("public \(mutable ? "var" : "let") \(prop_name): \(type_name)\(required ? "" : "?")")
         return newType(prop: prop_name, in: class_name)
     }
 
