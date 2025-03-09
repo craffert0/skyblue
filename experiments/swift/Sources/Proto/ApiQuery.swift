@@ -1,4 +1,4 @@
-public class ApiQuery<TParameters, TResult> where TParameters: ApiParameters {
-    public typealias Parameters = TParameters
-    public typealias Result = TResult
+public protocol ApiQuery: ApiRequest {
+    associatedtype Parameters
+    associatedtype Result
 }

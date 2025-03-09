@@ -1,4 +1,4 @@
-public class ApiSubscription<TParameters, TMessage> {
-    public typealias Parameters = TParameters
-    public typealias Message = TMessage
+public protocol ApiSubscription: ApiRequest {
+    associatedtype Parameters
+    associatedtype Message
 }

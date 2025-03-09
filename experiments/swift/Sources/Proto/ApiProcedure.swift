@@ -1,14 +1,14 @@
-public class ApiProcedure00 {}
+public protocol ApiProcedure00: ApiRequest {}
 
-public class ApiProcedure01<TOutput> {
-    public typealias Output = TOutput
+public protocol ApiProcedure01: ApiRequest {
+    associatedtype Output
 }
 
-public class ApiProcedure10<TInput> {
-    public typealias Input = TInput
+public protocol ApiProcedure10: ApiRequest {
+    associatedtype Input
 }
 
-public class ApiProcedure11<TInput, TOutput> {
-    public typealias Input = TInput
-    public typealias Output = TOutput
+public protocol ApiProcedure11: ApiRequest {
+    associatedtype Input
+    associatedtype Output
 }

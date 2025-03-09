@@ -46,8 +46,9 @@ struct Session {
     }
 
     func getPreferences() async throws -> Response<Proto.app.bsky.actor.GetPreferences.Result> {
+        typealias Query = Proto.app.bsky.actor.GetPreferences
         let request = HTTPRequest {
-            $0.url = "https://bsky.social/xrpc/app.bsky.actor.getPreferences"
+            $0.url = URL(string: "https://bsky.social/xrpc/\(Query.apiPath)")
             $0.method = .get
             $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
         }
@@ -59,13 +60,13 @@ struct Session {
     }
 
     mutating func getTimeline(limit: Int = 10) async throws -> Response<Proto.app.bsky.feed.GetTimeline.Result> {
-        typealias GetTimeline = Proto.app.bsky.feed.GetTimeline
-        var params = GetTimeline.Parameters(limit: limit)
+        typealias Query = Proto.app.bsky.feed.GetTimeline
+        var params = Query.Parameters(limit: limit)
         if let cursor {
             params.cursor = cursor
         }
         let request = try HTTPRequest {
-            $0.url = try URL(string: "https://bsky.social/xrpc/app.bsky.feed.getTimeline")?
+            $0.url = try URL(string: "https://bsky.social/xrpc/\(Query.apiPath)")?
                 .appending(queryItems: params.queryItems())
             $0.method = .get
             $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
@@ -83,10 +84,10 @@ struct Session {
     }
 
     func getSelfAuthorFeed(limit: Int = 10) async throws -> Response<Proto.app.bsky.feed.GetAuthorFeed.Result> {
-        typealias GetAuthorFeed = Proto.app.bsky.feed.GetAuthorFeed
-        let params = GetAuthorFeed.Parameters(actor: did, limit: limit)
+        typealias Query = Proto.app.bsky.feed.GetAuthorFeed
+        let params = Query.Parameters(actor: did, limit: limit)
         let request = try HTTPRequest {
-            $0.url = try URL(string: "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed")?
+            $0.url = try URL(string: "https://bsky.social/xrpc/\(Query.apiPath)")?
                 .appending(queryItems: params.queryItems())
             $0.method = .get
             $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))

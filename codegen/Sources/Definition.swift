@@ -107,7 +107,7 @@ class ParametersDefinition: Decodable {
                      with definitions: Definitions)
     {
         p.println("public struct Parameters: ApiParameters {")
-        if let properties = def?.properties {
+        if let properties = def?.properties, properties.count > 0 {
             // Member variables
             properties.emit(on: p, in: "Parameters", with: definitions, mutable: true)
 
@@ -153,8 +153,11 @@ class QueryDefinition: Decodable {
         if let description {
             p.comment(description)
         }
-        p.println("public class \(class_name): ApiQuery<\(class_name).Parameters, \(class_name).Result> {")
+        p.println("public class \(class_name): ApiQuery {")
         p.indent()
+
+        p.println("public static let apiPath = \"\(p.namespace)\"")
+        p.newline()
         ParametersDefinition.emit(parameters, on: p, with: definitions)
 
         p.newline()
@@ -182,8 +185,6 @@ class ProcedureDefinition: Decodable {
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
         let class_name = to_upper(name)
-        let input_name = class_name + ".Input"
-        let output_name = class_name + ".Output"
         if let description {
             p.comment(description)
         }
@@ -192,13 +193,14 @@ class ProcedureDefinition: Decodable {
         case (nil, nil):
             p.println("public class \(class_name): ApiProcedure00 {")
         case (_, nil):
-            p.println("public class \(class_name): ApiProcedure10<\(input_name)> {")
+            p.println("public class \(class_name): ApiProcedure10 {")
         case (nil, _):
-            p.println("public class \(class_name): ApiProcedure01<\(output_name)> {")
+            p.println("public class \(class_name): ApiProcedure01 {")
         default:
-            p.println("public class \(class_name): ApiProcedure11<\(input_name), \(output_name)> {")
+            p.println("public class \(class_name): ApiProcedure11 {")
         }
         p.indent()
+        p.println("public static let apiPath = \"\(p.namespace)\"")
 
         if let input {
             p.newline()
@@ -237,9 +239,11 @@ class SubscriptionDefinition: Decodable {
         let definitions = Definitions()
         let class_name = to_upper(name)
 
-        p.println("public class \(class_name): ApiSubscription<\(class_name).Parameters, \(class_name).Message> {")
+        p.println("public class \(class_name): ApiSubscription {")
         p.indent()
 
+        p.println("public static let apiPath = \"\(p.namespace)\"")
+        p.newline()
         ParametersDefinition.emit(parameters, on: p, with: definitions)
         p.newline()
         message.schema.emit("Message", p)
