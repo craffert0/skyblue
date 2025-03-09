@@ -204,14 +204,14 @@ class ProcedureDefinition: Decodable {
 
         if let input {
             p.newline()
-            p.println("public struct Input: Codable {")
+            p.println("public struct Input: ApiInput {")
             input.schema?.emit_properties(p, class_name, definitions, true)
             p.println("}")
         }
 
         if let output {
             p.newline()
-            p.println("public struct Output: Codable {")
+            p.println("public struct Output: ApiOutput {")
             output.schema?.emit_properties(p, class_name, definitions, false)
             p.println("}")
         }

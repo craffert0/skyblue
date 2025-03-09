@@ -2,6 +2,54 @@ import Foundation
 import Proto
 import RealHTTP
 
+extension ApiQuery {
+    static func query(auth: String, with params: Parameters? = nil) async throws -> Response<Result> {
+        var url = URL(string: "https://bsky.social/xrpc/\(apiPath)")
+        if let params {
+            try url?.append(queryItems: params.queryItems())
+        }
+        let request = HTTPRequest {
+            $0.url = url
+            $0.method = .get
+            $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + auth))
+        }
+
+        let response = try await request.fetch()
+        return try response.decodeResponse(Result.self)
+    }
+}
+
+extension ApiProcedure11 {
+    static func call(with input: Input, auth: String? = nil) async throws -> Response<Output> {
+        let request = HTTPRequest {
+            $0.url = URL(string: "https://bsky.social/xrpc/\(apiPath)")
+            $0.method = .post
+            $0.body = .json(input)
+        }
+        if let auth {
+            request.headers =
+                HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + auth))
+        }
+        let response = try await request.fetch()
+        return try response.decodeResponse(Output.self)
+    }
+}
+
+extension ApiProcedure01 {
+    static func call(auth: String? = nil) async throws -> Response<Output> {
+        let request = HTTPRequest {
+            $0.url = URL(string: "https://bsky.social/xrpc/\(apiPath)")
+            $0.method = .post
+        }
+        if let auth {
+            request.headers =
+                HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + auth))
+        }
+        let response = try await request.fetch()
+        return try response.decodeResponse(Output.self)
+    }
+}
+
 struct Session {
     let verbose: Bool
     var accessJwt: String
@@ -11,52 +59,31 @@ struct Session {
 
     init?(with creds: Credentials, verbose: Bool) async throws {
         self.verbose = verbose
-        let response =
-            try await HTTPRequest(method: .post,
-                                  "https://bsky.social/xrpc/com.atproto.server.createSession",
-                                  body: .json(creds)).fetch()
-        if response.statusCode != .ok {
+        typealias Request = com.atproto.server.CreateSession
+        switch try await Request.call(with: creds) {
+        case let .value(login):
+            accessJwt = login.accessJwt
+            refreshJwt = login.refreshJwt
+            did = login.did
+        case let .error(code, error):
+            print(code, error)
             return nil
         }
-        if verbose {
-            print("DEBUG headers", response.headers)
-        }
-        let login = try response.decode(Proto.com.atproto.server.CreateSession.Output.self)
-        accessJwt = login.accessJwt
-        refreshJwt = login.refreshJwt
-        did = login.did
     }
 
     mutating func refresh() async throws {
-        let request = HTTPRequest {
-            $0.url = "https://bsky.social/xrpc/com.atproto.server.refreshSession"
-            $0.method = .post
-            $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + refreshJwt))
+        typealias Request = com.atproto.server.RefreshSession
+        switch try await Request.call(auth: refreshJwt) {
+        case let .value(login):
+            accessJwt = login.accessJwt
+            refreshJwt = login.refreshJwt
+        case let .error(code, error):
+            print(code, error)
         }
-        let response = try await request.fetch()
-        if verbose {
-            print("DEBUG headers", response.headers)
-        }
-        if response.statusCode != .ok {
-            return
-        }
-        let new_session = try response.decode(Proto.com.atproto.server.RefreshSession.Output.self)
-        accessJwt = new_session.accessJwt
-        refreshJwt = new_session.refreshJwt
     }
 
     func getPreferences() async throws -> Response<Proto.app.bsky.actor.GetPreferences.Result> {
-        typealias Query = Proto.app.bsky.actor.GetPreferences
-        let request = HTTPRequest {
-            $0.url = URL(string: "https://bsky.social/xrpc/\(Query.apiPath)")
-            $0.method = .get
-            $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
-        }
-        let response = try await request.fetch()
-        if verbose {
-            print("DEBUG headers", response.headers)
-        }
-        return try response.decodeResponse(Proto.app.bsky.actor.GetPreferences.Result.self)
+        try await Proto.app.bsky.actor.GetPreferences.query(auth: accessJwt)
     }
 
     mutating func getTimeline(limit: Int = 10) async throws -> Response<Proto.app.bsky.feed.GetTimeline.Result> {
@@ -65,18 +92,7 @@ struct Session {
         if let cursor {
             params.cursor = cursor
         }
-        let request = try HTTPRequest {
-            $0.url = try URL(string: "https://bsky.social/xrpc/\(Query.apiPath)")?
-                .appending(queryItems: params.queryItems())
-            $0.method = .get
-            $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
-        }
-
-        let response = try await request.fetch()
-        if verbose {
-            print("DEBUG headers", response.headers)
-        }
-        let result = try response.decodeResponse(Proto.app.bsky.feed.GetTimeline.Result.self)
+        let result = try await Query.query(auth: accessJwt, with: params)
         if case let .value(tl) = result {
             cursor = tl.cursor
         }
@@ -86,17 +102,6 @@ struct Session {
     func getSelfAuthorFeed(limit: Int = 10) async throws -> Response<Proto.app.bsky.feed.GetAuthorFeed.Result> {
         typealias Query = Proto.app.bsky.feed.GetAuthorFeed
         let params = Query.Parameters(actor: did, limit: limit)
-        let request = try HTTPRequest {
-            $0.url = try URL(string: "https://bsky.social/xrpc/\(Query.apiPath)")?
-                .appending(queryItems: params.queryItems())
-            $0.method = .get
-            $0.headers = HTTPHeaders(arrayLiteral: .init(name: "Authorization", value: "Bearer " + accessJwt))
-        }
-
-        let response = try await request.fetch()
-        if verbose {
-            print("DEBUG headers", response.headers)
-        }
-        return try response.decodeResponse(Proto.app.bsky.feed.GetAuthorFeed.Result.self)
+        return try await Query.query(auth: accessJwt, with: params)
     }
 }
