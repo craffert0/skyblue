@@ -14,7 +14,7 @@ struct Main: AsyncParsableCommand {
         @Flag(name: [.long, .customShort("v")], help: "Be verbose.")
         var verbose = false
 
-        @Argument(transform: credentials_decode(from:))
+        @Argument(transform: Credentials.decode(from:))
         var creds: Credentials
 
         func session() async throws -> Session? {

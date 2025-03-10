@@ -32,6 +32,15 @@ func generate(fromFile src: FilePath, toFile dst: FilePath,
     try fm.createFile(atFilePath: dst, contents: file.emit())
 }
 
+func generateTag(toFile dst: FilePath,
+                 withFileManager fm: FileManager) throws
+{
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = .prettyPrinted
+    try fm.createFile(atFilePath: dst,
+                      contents: encoder.encode(GenerationTag()))
+}
+
 func generate(fromPath indir: FilePath, toPath outdir: FilePath,
               withFileManager fm: FileManager = FileManager.default) throws
 {
@@ -58,6 +67,8 @@ func generate(fromPath indir: FilePath, toPath outdir: FilePath,
             try generate(fromFile: src, toFile: dst, withFileManager: fm)
         }
     }
+    try generateTag(toFile: outdir.appending(".generationTag.json"),
+                    withFileManager: fm)
 }
 
 @main
