@@ -2,6 +2,12 @@ import ArgumentParser
 import Foundation
 import Proto
 
+typealias GetAuthorFeed = app.bsky.feed.GetAuthorFeed
+typealias GetPreferences = app.bsky.actor.GetPreferences
+typealias GetTimeline = app.bsky.feed.GetTimeline
+typealias CreateSession = com.atproto.server.CreateSession
+typealias RefreshSession = com.atproto.server.RefreshSession
+
 @main
 struct Main: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
@@ -17,8 +23,14 @@ struct Main: AsyncParsableCommand {
         @Argument(transform: Credentials.decode(from:))
         var creds: Credentials
 
-        func session() async throws -> Session? {
-            try await Session(with: creds, verbose: verbose)
+        func login() async throws -> CreateSession.Output? {
+            switch try await CreateSession.call(with: creds) {
+            case let .value(login):
+                return login
+            case let .error(code, error):
+                print(code, error)
+                return nil
+            }
         }
     }
 
@@ -28,8 +40,15 @@ struct Main: AsyncParsableCommand {
 
         @OptionGroup var options: Options
 
-        mutating func run() async throws {
-            try await options.session()?.getSelfAuthorFeed().dumpJson()
+        func run() async throws {
+            guard let login = try await options.login() else {
+                return
+            }
+            try await GetAuthorFeed.query(
+                auth: login.accessJwt,
+                with: GetAuthorFeed.Parameters(actor: login.did, limit: 10)
+            )
+            .dumpJson()
         }
     }
 
@@ -39,8 +58,12 @@ struct Main: AsyncParsableCommand {
 
         @OptionGroup var options: Options
 
-        mutating func run() async throws {
-            try await options.session()?.getPreferences().dumpJson()
+        func run() async throws {
+            guard let login = try await options.login() else {
+                return
+            }
+            try await GetPreferences.query(auth: login.accessJwt)
+                .dumpJson()
         }
     }
 
@@ -50,15 +73,38 @@ struct Main: AsyncParsableCommand {
 
         @OptionGroup var options: Options
 
-        mutating func run() async throws {
-            guard var session = try await options.session() else {
+        func run() async throws {
+            guard let login = try await options.login() else {
                 return
             }
-            try await session.getTimeline().dumpJson()
-            try await session.getTimeline().dumpJson()
-            try await session.refresh()
-            try await session.getTimeline().dumpJson()
-            try await session.getTimeline().dumpJson()
+            var accessJwt = login.accessJwt
+            var refreshJwt = login.refreshJwt
+
+            var cursor: String? = nil
+            let params = { GetTimeline.Parameters(cursor: cursor, limit: 10) }
+
+            let call = {
+                switch try await GetTimeline.query(
+                    auth: accessJwt,
+                    with: params()
+                ) {
+                case let .value(result):
+                    cursor = result.cursor
+                    try result.dumpJson()
+                    return true
+                case let .error(code, error):
+                    print(code, error)
+                    return false
+                }
+            }
+            guard try await call() else { return }
+            guard try await call() else { return }
+            guard case let .value(result) = try await RefreshSession.call(auth: refreshJwt) else {
+                return
+            }
+            accessJwt = result.accessJwt
+            refreshJwt = result.refreshJwt
+            guard try await call() else { return }
         }
     }
 }
