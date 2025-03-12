@@ -82,9 +82,10 @@ extension [String: Property] {
               with definitions: Definitions, required: Set<String>? = nil,
               mutable: Bool = false)
     {
-        p.indent()
         let r = required ?? []
-        for k in r.sorted() {
+        let r_sorted = r.sorted()
+        let n_sorted = Set(keys).subtracting(r).sorted()
+        for k in r_sorted {
             definitions.add(self[k]!.emit(prop: k, in: class_name,
                                           on: p, mutable: mutable,
                                           required: true))
@@ -92,11 +93,36 @@ extension [String: Property] {
         if r.count != 0, r.count != count {
             p.newline()
         }
-        for k in Set(keys).subtracting(r).sorted() {
+        for k in n_sorted {
             definitions.add(self[k]!.emit(prop: k, in: class_name,
                                           on: p, mutable: mutable))
         }
+
+        p.newline()
+
+        p.println("public init(")
+        p.indent()
+        var count = 0
+        for name in r_sorted {
+            count += 1
+            let prop = self[name]!
+            let comma = (count == self.count) ? "" : ","
+            p.println("\(name): \(prop.type_name(class_name, name))\(comma)")
+        }
+        for name in n_sorted {
+            count += 1
+            let prop = self[name]!
+            let comma = (count == self.count) ? "" : ","
+            p.println("\(name): \(prop.type_name(class_name, name))? = nil\(comma)")
+        }
         p.outdent()
+        p.println(") {")
+        p.indent()
+        for name in r_sorted + n_sorted {
+            p.println("self.\(name) = \(name)")
+        }
+        p.outdent()
+        p.println("}")
     }
 }
 
@@ -108,34 +134,8 @@ class ParametersDefinition: Decodable {
     {
         p.println("public struct Parameters: ApiParameters {")
         if let properties = def?.properties, properties.count > 0 {
-            // Member variables
+            p.indent()
             properties.emit(on: p, in: "Parameters", with: definitions, mutable: true)
-
-            p.newline()
-
-            // init()
-
-            let items = properties
-                .map { (name: $0, prop: $1) }
-                .sorted { $0.name < $1.name }
-
-            p.indent()
-            p.println("public init(")
-            p.indent()
-            for (i, item) in items.enumerated() {
-                let (name, prop) = item
-                let comma = (i == items.count - 1) ? "" : ","
-                p.println("\(name): \(prop.type_name("none", name))? = nil\(comma)")
-            }
-            p.outdent()
-            p.println(") {")
-            p.indent()
-            for item in items {
-                let (name, _) = item
-                p.println("self.\(name) = \(name)")
-            }
-            p.outdent()
-            p.println("}")
             p.outdent()
         }
         p.println("}")
@@ -276,9 +276,11 @@ class ObjectDefinition: Decodable {
     func emit_properties(_ p: Printer, _ class_name: String,
                          _ definitions: Definitions, _ mutable: Bool)
     {
+        p.indent()
         properties?.emit(on: p, in: class_name, with: definitions,
                          required: required?.subtracting(nullable ?? []),
                          mutable: mutable)
+        p.outdent()
     }
 }
 
