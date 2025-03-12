@@ -10,10 +10,25 @@ struct Codegen: ParsableCommand {
     var outdir: FilePath
 
     func run() throws {
-        let g = Generator(fromPath: indir, toPath: outdir,
+        var g = Generator(fromPath: indir, toPath: outdir,
                           withFileManager: FileManager.default)
         try g.rmdirs()
-        try g.generate()
+        try g.generateFiles()
+        try g.generateTopEnum()
+    }
+}
+
+extension [String]: @retroactive Comparable {
+    // Lexical
+    public static func < (lhs: [String], rhs: [String]) -> Bool {
+        for i in 0 ..< Swift.min(lhs.count, rhs.count) {
+            if lhs[i] < rhs[i] {
+                return true
+            } else if rhs[i] < lhs[i] {
+                return false
+            }
+        }
+        return lhs.count < rhs.count
     }
 }
 
@@ -21,6 +36,7 @@ struct Generator {
     let indir: FilePath
     let outdir: FilePath
     let fm: FileManager
+    var namespaces: Set<[String]> = []
 
     init(fromPath indir: FilePath, toPath outdir: FilePath,
          withFileManager fm: FileManager)
@@ -51,7 +67,7 @@ struct Generator {
         try fm.removeItem(atFilePath: outdir)
     }
 
-    func generate() throws {
+    mutating func generateFiles() throws {
         try fm.createDirectory(atFilePath: outdir)
         for case let path as String in fm.enumerator(atFilePath: indir)! {
             let src = indir.appending(path)
@@ -72,23 +88,47 @@ struct Generator {
                 let dst = outdir
                     .appending(components)
                     .appending(swift_file_name)
-                try generate(fromFile: src, toFile: dst)
+                try generateFile(fromFile: src, toFile: dst)
             }
         }
-        try generateTag(toFile: outdir.appending(".generationTag.json"))
     }
 
-    func generate(fromFile src: FilePath, toFile dst: FilePath) throws {
+    mutating func generateFile(fromFile src: FilePath, toFile dst: FilePath) throws {
         let file =
             try JSONDecoder().decode(File.self,
                                      from: fm.contents(atFilePath: src)!)
         try fm.createFile(atFilePath: dst, contents: file.emit())
+        namespaces.insert(file.namespace)
     }
 
-    func generateTag(toFile dst: FilePath) throws {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        try fm.createFile(atFilePath: dst,
-                          contents: encoder.encode(GenerationTag()))
+    func generateTopEnum() throws {
+        let p = Printer(inNamespace: "")
+        p.println("// Generated: \(Date.now.ISO8601Format())")
+        generateEnum(from: namespaces, into: p, top: true)
+        try fm.createFile(atFilePath: outdir.appending("TopEnum.swift"),
+                          contents: p.data)
+    }
+
+    func generateEnum(from namespace: Set<[String]>, into p: Printer,
+                      top: Bool = false)
+    {
+        for first in Set(namespace.map { $0.first! }).sorted() {
+            if top {
+                p.newline()
+            }
+            let subset = namespace
+                .filter { $0.first == first }
+                .map { $0[1 ..< $0.count].map { String($0) } }
+                .filter { !$0.isEmpty }
+            if subset.isEmpty {
+                p.println("public enum \(first) {}")
+            } else {
+                p.println("public enum \(first) {")
+                p.indent()
+                generateEnum(from: Set(subset), into: p)
+                p.outdent()
+                p.println("}")
+            }
+        }
     }
 }

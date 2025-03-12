@@ -23,12 +23,12 @@ test_codegen:
 LEXICON_DIR := ../atproto/lexicons
 
 GENERATION_DIR := experiments/swift/Sources/Proto/generated
-GENERATION_TAG := $(GENERATION_DIR)/.generationTag.json
+GENERATION_ENUM := $(GENERATION_DIR)/TopEnum.swift
 
-$(GENERATION_TAG): $(CODEGEN_APP)
+$(GENERATION_ENUM): $(CODEGEN_APP)
 	$(CODEGEN_APP) $(LEXICON_DIR) $(GENERATION_DIR)
 
-codegen: $(GENERATION_TAG)
+codegen: $(GENERATION_ENUM)
 
 ## Build and test the experiments app
 
@@ -37,10 +37,10 @@ EXPERIMENTS_FILES := $(shell find experiments/swift/Sources -type f -name '*.swi
 
 experiments: $(EXPERIMENTS_APP)
 
-$(EXPERIMENTS_APP): $(EXPERIMENTS_FILES) $(GENERATION_TAG)
+$(EXPERIMENTS_APP): $(EXPERIMENTS_FILES) $(GENERATION_ENUM)
 	cd experiments/swift ; swift build
 
-test_experiments: $(GENERATION_TAG)
+test_experiments: $(GENERATION_ENUM)
 	cd experiments/swift ; swift test
 
 experiment_prefs: $(EXPERIMENTS_APP)
