@@ -1,3 +1,5 @@
+.PHONY: codegen
+
 all: test experiments
 
 test: test_experiments test_codegen
@@ -25,6 +27,8 @@ GENERATION_TAG := $(GENERATION_DIR)/.generationTag.json
 
 $(GENERATION_TAG): $(CODEGEN_APP)
 	$(CODEGEN_APP) $(LEXICON_DIR) $(GENERATION_DIR)
+
+codegen: $(GENERATION_TAG)
 
 ## Build and test the experiments app
 
