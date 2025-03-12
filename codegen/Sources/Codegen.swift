@@ -2,84 +2,133 @@ import ArgumentParser
 import Foundation
 import System
 
-func rmdirs(atPath path: FilePath,
-            withFileManager fm: FileManager = FileManager.default) throws
-{
-    if !fm.fileExists(atFilePath: path) {
-        return
-    }
-
-    var directories: [FilePath] = []
-    for f in fm.enumerator(atFilePath: path)! {
-        let full = path.appending(f as! String)
-        if try fm.isDictionary(atFilePath: full) {
-            directories.append(full)
-        } else {
-            try fm.removeItem(atFilePath: full)
-        }
-    }
-    for d in directories.reversed() {
-        try fm.removeItem(atFilePath: d)
-    }
-    try fm.removeItem(atFilePath: path)
-}
-
-func generate(fromFile src: FilePath, toFile dst: FilePath,
-              withFileManager fm: FileManager) throws
-{
-    let file = try JSONDecoder().decode(File.self,
-                                        from: fm.contents(atFilePath: src)!)
-    try fm.createFile(atFilePath: dst, contents: file.emit())
-}
-
-func generateTag(toFile dst: FilePath,
-                 withFileManager fm: FileManager) throws
-{
-    let encoder = JSONEncoder()
-    encoder.outputFormatting = .prettyPrinted
-    try fm.createFile(atFilePath: dst,
-                      contents: encoder.encode(GenerationTag()))
-}
-
-func generate(fromPath indir: FilePath, toPath outdir: FilePath,
-              withFileManager fm: FileManager = FileManager.default) throws
-{
-    try fm.createDirectory(atFilePath: outdir)
-    for case let path as String in fm.enumerator(atFilePath: indir)! {
-        let src = indir.appending(path)
-        if try fm.isDictionary(atFilePath: src) {
-            let dst = outdir.appending(path)
-            try fm.createDirectory(atFilePath: dst)
-        } else {
-            // app/bsky/feed/defs.json
-            let full_path = FilePath(path)
-
-            // [app bsky feed]
-            let dir_components = full_path.removingLastComponent().components
-
-            // app.bsky.feed.defs.swift
-            let swift_file_name =
-                (dir_components.map(\.string) + [full_path.stem!, "swift"])
-                    .joined(separator: ".")
-            let dst = outdir
-                .appending(dir_components)
-                .appending(swift_file_name)
-            try generate(fromFile: src, toFile: dst, withFileManager: fm)
-        }
-    }
-    try generateTag(toFile: outdir.appending(".generationTag.json"),
-                    withFileManager: fm)
-}
-
 @main
 struct Codegen: ParsableCommand {
-    @Argument var indir_name: String
-    @Argument var outdir_name: String
+    @Argument(transform: FilePath.init(stringLiteral:))
+    var indir: FilePath
+    @Argument(transform: FilePath.init(stringLiteral:))
+    var outdir: FilePath
 
-    mutating func run() throws {
-        let indir = FilePath(indir_name)
-        let outdir = FilePath(outdir_name)
-        try rmdirs(atPath: outdir)
-        try generate(fromPath: indir, toPath: outdir)
+    func run() throws {
+        var g = Generator(fromPath: indir, toPath: outdir,
+                          withFileManager: FileManager.default)
+        try g.rmdirs()
+        try g.generateFiles()
+        try g.generateTopEnum()
+    }
+}
+
+extension [String]: @retroactive Comparable {
+    // Lexical
+    public static func < (lhs: [String], rhs: [String]) -> Bool {
+        for i in 0 ..< Swift.min(lhs.count, rhs.count) {
+            if lhs[i] < rhs[i] {
+                return true
+            } else if rhs[i] < lhs[i] {
+                return false
+            }
+        }
+        return lhs.count < rhs.count
+    }
+}
+
+struct Generator {
+    let indir: FilePath
+    let outdir: FilePath
+    let fm: FileManager
+    var namespaces: Set<[String]> = []
+
+    init(fromPath indir: FilePath, toPath outdir: FilePath,
+         withFileManager fm: FileManager)
+    {
+        self.indir = indir
+        self.outdir = outdir
+        self.fm = fm
+    }
+
+    func rmdirs() throws {
+        if !fm.fileExists(atFilePath: outdir) {
+            return
+        }
+
+        var directories: [FilePath] = []
+        for f in fm.enumerator(atFilePath: outdir)! {
+            let full = outdir.appending(f as! String)
+            if try fm.isDictionary(atFilePath: full) {
+                directories.append(full)
+            } else {
+                try fm.removeItem(atFilePath: full)
+            }
+        }
+        for d in directories.reversed() {
+            try fm.removeItem(atFilePath: d)
+        }
+
+        try fm.removeItem(atFilePath: outdir)
+    }
+
+    mutating func generateFiles() throws {
+        try fm.createDirectory(atFilePath: outdir)
+        for case let path as String in fm.enumerator(atFilePath: indir)! {
+            let src = indir.appending(path)
+            if try fm.isDictionary(atFilePath: src) {
+                let dst = outdir.appending(path)
+                try fm.createDirectory(atFilePath: dst)
+            } else {
+                // app/bsky/feed/defs.json
+                let full_path = FilePath(path)
+
+                // [app bsky feed]
+                let components = full_path.removingLastComponent().components
+
+                // app.bsky.feed.defs.swift
+                let swift_file_name =
+                    (components.map(\.string) + [full_path.stem!, "swift"])
+                        .joined(separator: ".")
+                let dst = outdir
+                    .appending(components)
+                    .appending(swift_file_name)
+                try generateFile(fromFile: src, toFile: dst)
+            }
+        }
+    }
+
+    mutating func generateFile(fromFile src: FilePath, toFile dst: FilePath) throws {
+        let file =
+            try JSONDecoder().decode(File.self,
+                                     from: fm.contents(atFilePath: src)!)
+        try fm.createFile(atFilePath: dst, contents: file.emit())
+        namespaces.insert(file.namespace)
+    }
+
+    func generateTopEnum() throws {
+        let p = Printer(inNamespace: "")
+        p.println("// Generated: \(Date.now.ISO8601Format())")
+        generateEnum(from: namespaces, into: p, top: true)
+        try fm.createFile(atFilePath: outdir.appending("TopEnum.swift"),
+                          contents: p.data)
+    }
+
+    func generateEnum(from namespace: Set<[String]>, into p: Printer,
+                      top: Bool = false)
+    {
+        for first in Set(namespace.map { $0.first! }).sorted() {
+            if top {
+                p.newline()
+            }
+            let subset = namespace
+                .filter { $0.first == first }
+                .map { $0[1 ..< $0.count].map { String($0) } }
+                .filter { !$0.isEmpty }
+            if subset.isEmpty {
+                p.println("public enum \(first) {}")
+            } else {
+                p.println("public enum \(first) {")
+                p.indent()
+                generateEnum(from: Set(subset), into: p)
+                p.outdent()
+                p.println("}")
+            }
+        }
     }
 }
