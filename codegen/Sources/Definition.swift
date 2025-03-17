@@ -133,13 +133,12 @@ class ParametersDefinition: Decodable {
                      with definitions: Definitions)
     {
         p.newline()
-        p.println("public struct Parameters: ApiParameters {")
-        if let properties = def?.properties, properties.count > 0 {
-            p.indent()
-            properties.emit(on: p, in: "Parameters", with: definitions, mutable: true)
-            p.outdent()
+        p.open("public struct Parameters: ApiParameters") {
+            if let properties = def?.properties, properties.count > 0 {
+                properties.emit(on: p, in: "Parameters", with: definitions,
+                                mutable: true)
+            }
         }
-        p.println("}")
     }
 }
 
@@ -151,17 +150,15 @@ class ErrorDefinition: Decodable {
 extension [ErrorDefinition] {
     func emit(on p: Printer) {
         p.newline()
-        p.println("public enum Error {")
-        p.indent()
-        for e in self {
-            if let description = e.description {
-                p.comment(description)
+        p.open("public enum Error") {
+            for e in self {
+                if let description = e.description {
+                    p.comment(description)
+                }
+                p.println("case " + e.name)
             }
-            p.println("case " + e.name)
+            p.println("case unknown(String)")
         }
-        p.println("case unknown(String)")
-        p.outdent()
-        p.println("}")
     }
 }
 
@@ -177,17 +174,12 @@ class QueryDefinition: Decodable {
         if let description {
             p.comment(description)
         }
-        p.println("public class \(class_name): ApiQuery {")
-        p.indent()
-
-        p.println("public static let apiPath = \"\(p.namespace)\"")
-        ParametersDefinition.emit(parameters, on: p, with: definitions)
-        output?.emit("Output", on: p, in: class_name, with: definitions)
-        errors?.emit(on: p)
-
-        p.outdent()
-        p.println("}")
-
+        p.open("public class \(class_name): ApiQuery") {
+            p.println("public static let apiPath = \"\(p.namespace)\"")
+            ParametersDefinition.emit(parameters, on: p, with: definitions)
+            output?.emit("Output", on: p, in: class_name, with: definitions)
+            errors?.emit(on: p)
+        }
         definitions.emit(p)
     }
 }
@@ -206,26 +198,23 @@ class ProcedureDefinition: Decodable {
             p.comment(description)
         }
 
-        switch (input, output) {
+        let proto = switch (input, output) {
         case (nil, nil):
-            p.println("public class \(class_name): ApiProcedure00 {")
+            "ApiProcedure00"
         case (_, nil):
-            p.println("public class \(class_name): ApiProcedure10 {")
+            "ApiProcedure10"
         case (nil, _):
-            p.println("public class \(class_name): ApiProcedure01 {")
+            "ApiProcedure01"
         default:
-            p.println("public class \(class_name): ApiProcedure11 {")
+            "ApiProcedure11"
         }
-        p.indent()
-
-        p.println("public static let apiPath = \"\(p.namespace)\"")
-        ParametersDefinition.emit(parameters, on: p, with: definitions)
-        input?.emit("Input", on: p, in: class_name, with: definitions)
-        output?.emit("Output", on: p, in: class_name, with: definitions)
-        errors?.emit(on: p)
-
-        p.outdent()
-        p.println("}")
+        p.open("public class \(class_name): \(proto)") {
+            p.println("public static let apiPath = \"\(p.namespace)\"")
+            ParametersDefinition.emit(parameters, on: p, with: definitions)
+            input?.emit("Input", on: p, in: class_name, with: definitions)
+            output?.emit("Output", on: p, in: class_name, with: definitions)
+            errors?.emit(on: p)
+        }
 
         definitions.emit(p)
     }
@@ -241,15 +230,13 @@ class FunctionBodyDefinition: Decodable {
               with definitions: Definitions)
     {
         p.newline()
-        p.println("public struct \(name): ApiFunctionBody {")
-        p.indent()
-        p.println("public static let encoding = \"\(encoding)\"")
-        p.outdent()
-        if let schema {
-            p.newline()
-            schema.emit_properties(p, class_name, definitions, false)
+        p.open("public struct \(name): ApiFunctionBody") {
+            p.println("public static let encoding = \"\(encoding)\"")
+            if let schema {
+                p.newline()
+                schema.emit_properties(p, class_name, definitions, false)
+            }
         }
-        p.println("}")
     }
 }
 
@@ -262,18 +249,13 @@ class SubscriptionDefinition: Decodable {
         let definitions = Definitions()
         let class_name = to_upper(name)
 
-        p.println("public class \(class_name): ApiSubscription {")
-        p.indent()
-
-        p.println("public static let apiPath = \"\(p.namespace)\"")
-        ParametersDefinition.emit(parameters, on: p, with: definitions)
-        p.newline()
-        message.schema.emit("Message", p)
-
-        errors?.emit(on: p)
-
-        p.outdent()
-        p.println("}")
+        p.open("public class \(class_name): ApiSubscription") {
+            p.println("public static let apiPath = \"\(p.namespace)\"")
+            ParametersDefinition.emit(parameters, on: p, with: definitions)
+            p.newline()
+            message.schema.emit("Message", p)
+            errors?.emit(on: p)
+        }
 
         definitions.emit(p)
     }
@@ -291,20 +273,18 @@ class ObjectDefinition: Decodable {
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
         let class_name = to_upper(name)
-        p.println("public class \(class_name): Codable {")
-        emit_properties(p, class_name, definitions, false)
-        p.println("}")
+        p.open("public class \(class_name): Codable") {
+            emit_properties(p, class_name, definitions, false)
+        }
         definitions.emit(p)
     }
 
     func emit_properties(_ p: Printer, _ class_name: String,
                          _ definitions: Definitions, _ mutable: Bool)
     {
-        p.indent()
         properties?.emit(on: p, in: class_name, with: definitions,
                          required: required?.subtracting(nullable ?? []),
                          mutable: mutable)
-        p.outdent()
     }
 }
 
@@ -319,9 +299,9 @@ class RecordDefinition: Decodable {
             p.comment(description)
         }
         let class_name = to_upper(name)
-        p.println("public class \(class_name): Codable {")
-        record.emit_properties(p, class_name, definitions, false)
-        p.println("}")
+        p.open("public class \(class_name): Codable") {
+            record.emit_properties(p, class_name, definitions, false)
+        }
         definitions.emit(p)
     }
 }

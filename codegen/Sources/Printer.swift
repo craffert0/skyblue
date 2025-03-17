@@ -3,8 +3,8 @@ import Foundation
 class Printer {
     let namespace: String
 
-    var body = ""
-    var indent_ = ""
+    private var body = ""
+    private var indent_ = ""
     var data: Data {
         Data(body.utf8)
     }
@@ -17,6 +17,16 @@ class Printer {
         body += indent_
         body += s
         body += "\n"
+    }
+
+    func open(_ s: String, body: () -> Void) {
+        println(s + " {")
+        indent()
+
+        body()
+
+        outdent()
+        println("}")
     }
 
     func newline() {
