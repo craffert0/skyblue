@@ -1,1 +1,3 @@
-public protocol ApiFunctionBody: Codable {}
+public protocol ApiFunctionBody: Codable {
+    static var encoding: String { get }
+}

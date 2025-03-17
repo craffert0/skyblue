@@ -132,6 +132,7 @@ class ParametersDefinition: Decodable {
     static func emit(_ def: ParametersDefinition?, on p: Printer,
                      with definitions: Definitions)
     {
+        p.newline()
         p.println("public struct Parameters: ApiParameters {")
         if let properties = def?.properties, properties.count > 0 {
             p.indent()
@@ -180,16 +181,8 @@ class QueryDefinition: Decodable {
         p.indent()
 
         p.println("public static let apiPath = \"\(p.namespace)\"")
-        p.newline()
         ParametersDefinition.emit(parameters, on: p, with: definitions)
-
-        if let output {
-            p.newline()
-            p.println("public struct Output: ApiFunctionBody {")
-            output.schema?.emit_properties(p, class_name, definitions, false)
-            p.println("}")
-        }
-
+        output?.emit("Output", on: p, in: class_name, with: definitions)
         errors?.emit(on: p)
 
         p.outdent()
@@ -224,25 +217,11 @@ class ProcedureDefinition: Decodable {
             p.println("public class \(class_name): ApiProcedure11 {")
         }
         p.indent()
+
         p.println("public static let apiPath = \"\(p.namespace)\"")
-
-        p.newline()
         ParametersDefinition.emit(parameters, on: p, with: definitions)
-
-        if let input {
-            p.newline()
-            p.println("public struct Input: ApiFunctionBody {")
-            input.schema?.emit_properties(p, class_name, definitions, true)
-            p.println("}")
-        }
-
-        if let output {
-            p.newline()
-            p.println("public struct Output: ApiFunctionBody {")
-            output.schema?.emit_properties(p, class_name, definitions, false)
-            p.println("}")
-        }
-
+        input?.emit("Input", on: p, in: class_name, with: definitions)
+        output?.emit("Output", on: p, in: class_name, with: definitions)
         errors?.emit(on: p)
 
         p.outdent()
@@ -255,7 +234,23 @@ class ProcedureDefinition: Decodable {
 // Query & Procedure Input & Output
 class FunctionBodyDefinition: Decodable {
     let description: String?
+    let encoding: String
     let schema: ObjectDefinition?
+
+    func emit(_ name: String, on p: Printer, in class_name: String,
+              with definitions: Definitions)
+    {
+        p.newline()
+        p.println("public struct \(name): ApiFunctionBody {")
+        p.indent()
+        p.println("public static let encoding = \"\(encoding)\"")
+        p.outdent()
+        if let schema {
+            p.newline()
+            schema.emit_properties(p, class_name, definitions, false)
+        }
+        p.println("}")
+    }
 }
 
 class SubscriptionDefinition: Decodable {
@@ -271,7 +266,6 @@ class SubscriptionDefinition: Decodable {
         p.indent()
 
         p.println("public static let apiPath = \"\(p.namespace)\"")
-        p.newline()
         ParametersDefinition.emit(parameters, on: p, with: definitions)
         p.newline()
         message.schema.emit("Message", p)
