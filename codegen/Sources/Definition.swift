@@ -80,22 +80,26 @@ class Definitions {
 extension [String: Property] {
     func emit(on p: Printer, in class_name: String,
               with definitions: Definitions, required: Set<String>? = nil,
+              nullable: Set<String>? = nil,
               mutable: Bool = false)
     {
         let r = required ?? []
+        let n = nullable ?? []
         let r_sorted = r.sorted()
-        let n_sorted = Set(keys).subtracting(r).sorted()
+        let o_sorted = Set(keys).subtracting(r).sorted()
         for k in r_sorted {
             definitions.add(self[k]!.emit(prop: k, in: class_name,
                                           on: p, mutable: mutable,
+                                          nullable: n.contains(k),
                                           required: true))
         }
         if r.count != 0, r.count != count {
             p.newline()
         }
-        for k in n_sorted {
+        for k in o_sorted {
             definitions.add(self[k]!.emit(prop: k, in: class_name,
-                                          on: p, mutable: mutable))
+                                          on: p, mutable: mutable,
+                                          nullable: n.contains(k)))
         }
 
         p.newline()
@@ -107,18 +111,20 @@ extension [String: Property] {
             count += 1
             let prop = self[name]!
             let comma = (count == self.count) ? "" : ","
-            p.println("\(name): \(prop.type_name(class_name, name))\(comma)")
+            let type_name = prop.type_name(class_name, name, n.contains(name))
+            p.println("\(name): \(type_name)\(comma)")
         }
-        for name in n_sorted {
+        for name in o_sorted {
             count += 1
             let prop = self[name]!
             let comma = (count == self.count) ? "" : ","
-            p.println("\(name): \(prop.type_name(class_name, name))? = nil\(comma)")
+            let type_name = prop.type_name(class_name, name, n.contains(name))
+            p.println("\(name): \(type_name)? = nil\(comma)")
         }
         p.outdent()
         p.println(") {")
         p.indent()
-        for name in r_sorted + n_sorted {
+        for name in r_sorted + o_sorted {
             p.println("self.\(name) = \(name)")
         }
         p.outdent()
@@ -266,9 +272,9 @@ class SubscriptionDefinition: Decodable {
 }
 
 class ObjectDefinition: Decodable {
+    let properties: [String: Property]?
     let required: Set<String>?
     let nullable: Set<String>?
-    let properties: [String: Property]?
 
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
@@ -283,7 +289,7 @@ class ObjectDefinition: Decodable {
                          _ definitions: Definitions, _ mutable: Bool)
     {
         properties?.emit(on: p, in: class_name, with: definitions,
-                         required: required?.subtracting(nullable ?? []),
+                         required: required, nullable: nullable,
                          mutable: mutable)
     }
 }
