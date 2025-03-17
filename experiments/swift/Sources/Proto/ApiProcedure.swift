@@ -1,14 +1,14 @@
 public protocol ApiProcedure00: ApiRequest {}
 
 public protocol ApiProcedure01: ApiRequest {
-    associatedtype Output: ApiOutput
+    associatedtype Output: ApiFunctionBody
 }
 
 public protocol ApiProcedure10: ApiRequest {
-    associatedtype Input: ApiInput
+    associatedtype Input: ApiFunctionBody
 }
 
 public protocol ApiProcedure11: ApiRequest {
-    associatedtype Input: ApiInput
-    associatedtype Output: ApiOutput
+    associatedtype Input: ApiFunctionBody
+    associatedtype Output: ApiFunctionBody
 }

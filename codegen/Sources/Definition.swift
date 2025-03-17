@@ -142,10 +142,33 @@ class ParametersDefinition: Decodable {
     }
 }
 
+class ErrorDefinition: Decodable {
+    let name: String
+    let description: String?
+}
+
+extension [ErrorDefinition] {
+    func emit(on p: Printer) {
+        p.newline()
+        p.println("public enum Error {")
+        p.indent()
+        for e in self {
+            if let description = e.description {
+                p.comment(description)
+            }
+            p.println("case " + e.name)
+        }
+        p.println("case unknown(String)")
+        p.outdent()
+        p.println("}")
+    }
+}
+
 class QueryDefinition: Decodable {
     let description: String?
     let parameters: ParametersDefinition?
-    let output: Output
+    let output: FunctionBodyDefinition?
+    let errors: [ErrorDefinition]?
 
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
@@ -160,27 +183,28 @@ class QueryDefinition: Decodable {
         p.newline()
         ParametersDefinition.emit(parameters, on: p, with: definitions)
 
-        p.newline()
+        if let output {
+            p.newline()
+            p.println("public struct Output: ApiFunctionBody {")
+            output.schema?.emit_properties(p, class_name, definitions, false)
+            p.println("}")
+        }
 
-        p.println("public struct Result: Codable {")
-        output.schema?.emit_properties(p, "Result", definitions, false)
-        p.println("}")
+        errors?.emit(on: p)
 
         p.outdent()
         p.println("}")
 
         definitions.emit(p)
     }
-
-    class Output: Decodable {
-        let schema: ObjectDefinition?
-    }
 }
 
 class ProcedureDefinition: Decodable {
     let description: String?
-    let input: Input?
-    let output: Output?
+    let parameters: ParametersDefinition?
+    let output: FunctionBodyDefinition?
+    let input: FunctionBodyDefinition?
+    let errors: [ErrorDefinition]?
 
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
@@ -202,38 +226,42 @@ class ProcedureDefinition: Decodable {
         p.indent()
         p.println("public static let apiPath = \"\(p.namespace)\"")
 
+        p.newline()
+        ParametersDefinition.emit(parameters, on: p, with: definitions)
+
         if let input {
             p.newline()
-            p.println("public struct Input: ApiInput {")
+            p.println("public struct Input: ApiFunctionBody {")
             input.schema?.emit_properties(p, class_name, definitions, true)
             p.println("}")
         }
 
         if let output {
             p.newline()
-            p.println("public struct Output: ApiOutput {")
+            p.println("public struct Output: ApiFunctionBody {")
             output.schema?.emit_properties(p, class_name, definitions, false)
             p.println("}")
         }
+
+        errors?.emit(on: p)
 
         p.outdent()
         p.println("}")
 
         definitions.emit(p)
     }
+}
 
-    class Input: Decodable {
-        let schema: ObjectDefinition?
-    }
-
-    class Output: Decodable {
-        let schema: ObjectDefinition?
-    }
+// Query & Procedure Input & Output
+class FunctionBodyDefinition: Decodable {
+    let description: String?
+    let schema: ObjectDefinition?
 }
 
 class SubscriptionDefinition: Decodable {
     let parameters: ParametersDefinition
     let message: Message
+    let errors: [ErrorDefinition]?
 
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
@@ -247,6 +275,8 @@ class SubscriptionDefinition: Decodable {
         ParametersDefinition.emit(parameters, on: p, with: definitions)
         p.newline()
         message.schema.emit("Message", p)
+
+        errors?.emit(on: p)
 
         p.outdent()
         p.println("}")
