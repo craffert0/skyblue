@@ -39,14 +39,14 @@ enum Property: Decodable {
         }
     }
 
-    func emit(prop prop_name: String, in class_name: String, on p: Printer,
-              mutable: Bool, required: Bool = false) -> (name: String,
-                                                         definition: Definition)?
-    {
+    func emit(
+        prop prop_name: String, in class_name: String, on p: Printer,
+        mutable: Bool, nullable: Bool, required: Bool = false
+    ) -> (name: String, definition: Definition)? {
         if let description {
             p.comment(description)
         }
-        let type_name = type_name(class_name, prop_name)
+        let type_name = type_name(class_name, prop_name, nullable)
         p.println("public \(mutable ? "var" : "let") \(prop_name): \(type_name)\(required ? "" : "?")")
         return newType(prop: prop_name, in: class_name)
     }
@@ -90,28 +90,33 @@ enum Property: Decodable {
         }
     }
 
-    func type_name(_ class_name: String, _ prop_name: String) -> String {
+    func type_name(_ class_name: String, _ prop_name: String,
+                   _ nullable: Bool = false) -> String
+    {
+        guard !nullable else {
+            return "Nullable<\(type_name(class_name, prop_name))>"
+        }
         switch self {
-        case .string:
-            "String"
+        case let .string(string):
+            return string.type_name
         case .integer:
-            "Int"
+            return "Int"
         case .boolean:
-            "Bool"
+            return "Bool"
         case let .ref(ref):
-            ref.ref.full_name
+            return ref.ref.full_name
         case let .array(array):
-            "[\(array.items.type_name(class_name, prop_name))]"
+            return "[\(array.items.type_name(class_name, prop_name))]"
         case .union:
-            unionName(for: prop_name, in: class_name)
+            return unionName(for: prop_name, in: class_name)
         case .blob:
-            "Blob"
+            return "Blob"
         case .bytes:
-            "Bytes"
+            return "Bytes"
         case .unknown:
-            "Unknown"
+            return "Unknown"
         case .cid_link:
-            "CidLink"
+            return "CidLink"
         }
     }
 }
@@ -119,6 +124,18 @@ enum Property: Decodable {
 class StringProperty: Decodable {
     let description: String?
     let format: String?
+
+    var type_name: String {
+        guard format != nil else {
+            return "String"
+        }
+        switch format {
+        case "datetime":
+            return "Date"
+        default:
+            return "String"
+        }
+    }
 }
 
 class IntegerProperty: Decodable {

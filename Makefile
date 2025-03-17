@@ -9,7 +9,7 @@ lint:
 
 ## Build and test the codegen app.
 
-CODEGEN_APP := codegen/.build/x86_64-apple-macosx/release/codegen
+CODEGEN_APP := codegen/.build/release/codegen
 CODEGEN_FILES := $(shell find codegen/Sources -type f -name '*.swift') codegen/Package.swift
 
 $(CODEGEN_APP): $(CODEGEN_FILES)

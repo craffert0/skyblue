@@ -63,12 +63,14 @@ struct Generator {
         for d in directories.reversed() {
             try fm.removeItem(atFilePath: d)
         }
-
-        try fm.removeItem(atFilePath: outdir)
     }
 
     mutating func generateFiles() throws {
-        try fm.createDirectory(atFilePath: outdir)
+        if try !fm.fileExists(atFilePath: outdir) ||
+            !fm.isDictionary(atFilePath: outdir)
+        {
+            try fm.createDirectory(atFilePath: outdir)
+        }
         for case let path as String in fm.enumerator(atFilePath: indir)! {
             let src = indir.appending(path)
             if try fm.isDictionary(atFilePath: src) {
@@ -123,11 +125,9 @@ struct Generator {
             if subset.isEmpty {
                 p.println("public enum \(first) {}")
             } else {
-                p.println("public enum \(first) {")
-                p.indent()
-                generateEnum(from: Set(subset), into: p)
-                p.outdent()
-                p.println("}")
+                p.open("public enum \(first)") {
+                    generateEnum(from: Set(subset), into: p)
+                }
             }
         }
     }
