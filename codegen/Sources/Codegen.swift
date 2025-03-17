@@ -125,11 +125,9 @@ struct Generator {
             if subset.isEmpty {
                 p.println("public enum \(first) {}")
             } else {
-                p.println("public enum \(first) {")
-                p.indent()
-                generateEnum(from: Set(subset), into: p)
-                p.outdent()
-                p.println("}")
+                p.open("public enum \(first)") {
+                    generateEnum(from: Set(subset), into: p)
+                }
             }
         }
     }

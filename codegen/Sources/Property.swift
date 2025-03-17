@@ -97,8 +97,8 @@ enum Property: Decodable {
             return "Nullable<\(type_name(class_name, prop_name))>"
         }
         switch self {
-        case .string:
-            return "String"
+        case let .string(string):
+            return string.type_name
         case .integer:
             return "Int"
         case .boolean:
@@ -124,6 +124,18 @@ enum Property: Decodable {
 class StringProperty: Decodable {
     let description: String?
     let format: String?
+
+    var type_name: String {
+        guard format != nil else {
+            return "String"
+        }
+        switch format {
+        case "datetime":
+            return "Date"
+        default:
+            return "String"
+        }
+    }
 }
 
 class IntegerProperty: Decodable {

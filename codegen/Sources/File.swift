@@ -15,25 +15,23 @@ class File: Decodable {
 
     func emit() -> Data {
         let p = Printer(inNamespace: id)
+        p.println("import Foundation")
+        p.newline()
+
         let ext = namespace.joined(separator: ".")
-        p.println("extension \(ext) {")
-        p.indent()
+        p.open("extension \(ext)") {
+            if defs["main"] != nil {
+                p.println("public typealias \(to_upper(name)) = \(name).Main")
+                p.newline()
+            }
 
-        if defs["main"] != nil {
-            p.println("public typealias \(to_upper(name)) = \(name).Main")
-            p.newline()
+            p.open("public enum \(name)") {
+                for k in defs.keys.sorted() {
+                    defs[k]?.emit(k, p)
+                    p.newline()
+                }
+            }
         }
-
-        p.println("public enum \(name) {")
-        p.indent()
-        for k in defs.keys.sorted() {
-            defs[k]?.emit(k, p)
-            p.newline()
-        }
-        p.outdent()
-        p.println("}")
-        p.outdent()
-        p.println("}")
         return p.data
     }
 }
