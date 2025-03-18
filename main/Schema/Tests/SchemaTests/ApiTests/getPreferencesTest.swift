@@ -1,5 +1,5 @@
 import Foundation
-import Proto
+import Schema
 import Testing
 
 @Test func parsePrefs() throws {

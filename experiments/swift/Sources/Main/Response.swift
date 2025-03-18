@@ -1,12 +1,12 @@
 import Foundation
-import Proto
 import RealHTTP
+import Schema
 
 extension HTTPStatusCode: @retroactive Encodable {}
 
 enum Response<Type: Encodable>: Encodable {
     case value(Type)
-    case error(HTTPStatusCode, Proto.ApiError)
+    case error(HTTPStatusCode, Schema.ApiError)
 }
 
 extension JSONDecoder.DateDecodingStrategy {
@@ -32,7 +32,7 @@ extension HTTPResponse {
             d.dateDecodingStrategy = .iso8601WithFractionalSeconds
             return try .value(d.decode(type, from: data ?? Data()))
         default:
-            return try .error(statusCode, decode(Proto.ApiError.self))
+            return try .error(statusCode, decode(Schema.ApiError.self))
         }
     }
 }

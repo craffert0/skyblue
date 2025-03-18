@@ -27,6 +27,7 @@
 		3B2FA3182D886EBE00B73219 /* SkyBlue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SkyBlue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B2FA32B2D886EBF00B73219 /* SkyBlueTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkyBlueTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B2FA3352D886EBF00B73219 /* SkyBlueUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkyBlueUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3BE458352D89B1F8000A0328 /* Schema */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Schema; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +76,7 @@
 		3B2FA30F2D886EBE00B73219 = {
 			isa = PBXGroup;
 			children = (
+				3BE458352D89B1F8000A0328 /* Schema */,
 				3B2FA31A2D886EBE00B73219 /* SkyBlue */,
 				3B2FA32E2D886EBF00B73219 /* SkyBlueTests */,
 				3B2FA3382D886EBF00B73219 /* SkyBlueUITests */,

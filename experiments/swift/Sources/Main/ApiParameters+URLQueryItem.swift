@@ -1,5 +1,5 @@
 import Foundation
-import Proto
+import Schema
 
 private enum StringOrInt: Codable {
     case string(String)
@@ -24,7 +24,7 @@ private enum StringOrInt: Codable {
     }
 }
 
-extension Proto.ApiParameters {
+extension Schema.ApiParameters {
     func queryItems() throws -> [URLQueryItem] {
         try JSONDecoder()
             .decode([String: StringOrInt].self,

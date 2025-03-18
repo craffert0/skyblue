@@ -1,12 +1,12 @@
 import ArgumentParser
 import Foundation
-import Proto
+import Schema
 
-typealias GetAuthorFeed = app.bsky.feed.GetAuthorFeed
-typealias GetPreferences = app.bsky.actor.GetPreferences
-typealias GetTimeline = app.bsky.feed.GetTimeline
-typealias CreateSession = com.atproto.server.CreateSession
-typealias RefreshSession = com.atproto.server.RefreshSession
+typealias GetAuthorFeed = Schema.app.bsky.feed.GetAuthorFeed
+typealias GetPreferences = Schema.app.bsky.actor.GetPreferences
+typealias GetTimeline = Schema.app.bsky.feed.GetTimeline
+typealias CreateSession = Schema.com.atproto.server.CreateSession
+typealias RefreshSession = Schema.com.atproto.server.RefreshSession
 
 @main
 struct Main: AsyncParsableCommand {

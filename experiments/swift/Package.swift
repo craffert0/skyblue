@@ -18,6 +18,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
         .package(url: "https://github.com/immobiliare/RealHTTP.git", from: "1.9.0"),
+        .package(path: "../../main/Schema/"),
     ],
 
     targets: [
@@ -26,6 +27,7 @@ let package = Package(
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "RealHTTP", package: "realhttp"),
+                .product(name: "Schema", package: "schema"),
                 "Proto",
             ]
         ),
@@ -35,9 +37,5 @@ let package = Package(
         ),
         .target(
             name: "Proto"),
-        .testTarget(
-            name: "ProtoTests",
-            dependencies: ["Proto"]
-        ),
     ]
 )

@@ -1,18 +1,18 @@
 import Foundation
 @testable import Main
-import Proto
+import Schema
 import Testing
 
-private struct MixedParameters: Proto.ApiParameters {
+private struct MixedParameters: Schema.ApiParameters {
     let first: String
     let second: String?
     let third: Int
     let fourth: Int?
 }
 
-private struct NoParameters: Proto.ApiParameters {}
+private struct NoParameters: Schema.ApiParameters {}
 
-private struct NullableParameters: Proto.ApiParameters {
+private struct NullableParameters: Schema.ApiParameters {
     let first: String?
     let second: String?
 }

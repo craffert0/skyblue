@@ -1,11 +1,11 @@
 // WARNING: This assumes the code is already generated, and that the
 // definition hasn't changed.
 
-import Proto
+import Schema
 import Testing
 
 private typealias TestParameters =
-    Proto.app.bsky.feed.GetAuthorFeed.Parameters
+    app.bsky.feed.GetAuthorFeed.Parameters
 
 @Suite struct GeneratedParametersTest {
     @Test func makeNone() throws {

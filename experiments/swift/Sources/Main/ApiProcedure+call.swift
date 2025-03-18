@@ -1,8 +1,8 @@
 import Foundation
-import Proto
 import RealHTTP
+import Schema
 
-extension ApiProcedure11 {
+extension Schema.ApiProcedure11 {
     static func call(
         with input: Input, auth: String? = nil
     ) async throws -> Response<Output> {
