@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3B064B572D89ED9D006AEE9A /* Schema in Frameworks */ = {isa = PBXBuildFile; productRef = 3B064B562D89ED9D006AEE9A /* Schema */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		3B2FA32C2D886EBF00B73219 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -53,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3B064B572D89ED9D006AEE9A /* Schema in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,6 +119,7 @@
 			);
 			name = SkyBlue;
 			packageProductDependencies = (
+				3B064B562D89ED9D006AEE9A /* Schema */,
 			);
 			productName = SkyBlue;
 			productReference = 3B2FA3182D886EBE00B73219 /* SkyBlue.app */;
@@ -197,6 +203,9 @@
 			);
 			mainGroup = 3B2FA30F2D886EBE00B73219;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3B064B552D89ED9D006AEE9A /* XCLocalSwiftPackageReference "Schema" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3B2FA3192D886EBE00B73219 /* Products */;
 			projectDirPath = "";
@@ -593,6 +602,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		3B064B552D89ED9D006AEE9A /* XCLocalSwiftPackageReference "Schema" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Schema;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3B064B562D89ED9D006AEE9A /* Schema */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Schema;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3B2FA3102D886EBE00B73219 /* Project object */;
 }

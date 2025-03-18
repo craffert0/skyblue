@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2013 Colin Rafferty <colin@rafferty.net>
 
+import Schema
 import SwiftUI
 
 struct LoginView: View {
     @Bindable var login: Login
+    @State var accessJwt: String?
 
     init(from login: Login) {
         self.login = login
@@ -29,12 +31,18 @@ struct LoginView: View {
                 }
                 .onSubmit { loginNow() }
             }
+            Text(accessJwt ?? "none")
             Button("Login") { loginNow() }
         }
     }
 
     func loginNow() {
-        print("login [\(login.identifier)/\(login.password)]")
+        com.atproto.server.CreateSession.call(with: login.input) {
+            let accessJwt = $0.accessJwt
+            DispatchQueue.main.async {
+                self.accessJwt = accessJwt
+            }
+        }.resume()
     }
 }
 
