@@ -18,9 +18,8 @@ extension Schema.ApiProcedure11 {
         completed: @escaping @Sendable (Result<Output>) -> Void
     ) -> URLSessionDataTask {
         let request = request(with: input, auth: auth)
-        return URLSession.shared.dataTask(with: request) { data, _, error in
-            completed(Result<Output>(data, error))
-        }
+        return URLSession.shared.resultTask(with: request,
+                                            completed: completed)
     }
 }
 
@@ -36,8 +35,7 @@ extension Schema.ApiProcedure01 {
         completed: @escaping @Sendable (Result<Output>) -> Void
     ) -> URLSessionDataTask {
         let request = request(auth: auth)
-        return URLSession.shared.dataTask(with: request) { data, _, error in
-            completed(Result<Output>(data, error))
-        }
+        return URLSession.shared.resultTask(with: request,
+                                            completed: completed)
     }
 }

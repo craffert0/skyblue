@@ -40,10 +40,12 @@ struct LoginView: View {
         com.atproto.server.CreateSession.call(with: login.input) { result in
             DispatchQueue.main.async {
                 switch result {
-                case let .error(error):
-                    print(error)
                 case let .value(session):
                     accessJwt = session.accessJwt
+                case let .http_error(error):
+                    print(error)
+                case let .error(error):
+                    print(error)
                 }
             }
         }.resume()

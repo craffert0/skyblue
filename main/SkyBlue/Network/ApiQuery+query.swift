@@ -18,8 +18,7 @@ extension Schema.ApiQuery {
         completed: @escaping @Sendable (Result<Output>) -> Void
     ) -> URLSessionDataTask {
         let request = request(auth: auth, with: params)
-        return URLSession.shared.dataTask(with: request) { data, _, error in
-            completed(Result<Output>(data, error))
-        }
+        return URLSession.shared.resultTask(with: request,
+                                            completed: completed)
     }
 }
