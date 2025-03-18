@@ -15,17 +15,11 @@ extension Schema.ApiProcedure11 {
 
     static func call(
         with input: Input, auth: String? = nil,
-        completed: @escaping @Sendable (Output) -> Void
+        completed: @escaping @Sendable (Result<Output>) -> Void
     ) -> URLSessionDataTask {
         let request = request(with: input, auth: auth)
         return URLSession.shared.dataTask(with: request) { data, _, error in
-            guard let data else { return }
-            do {
-                let output = try JSONDecoder().decode(Output.self, from: data)
-                DispatchQueue.main.async { completed(output) }
-            } catch {
-                print(error)
-            }
+            completed(Result<Output>(data, error))
         }
     }
 }
@@ -39,17 +33,11 @@ extension Schema.ApiProcedure01 {
 
     static func call(
         auth: String? = nil,
-        completed: @escaping @Sendable (Output) -> Void
+        completed: @escaping @Sendable (Result<Output>) -> Void
     ) -> URLSessionDataTask {
         let request = request(auth: auth)
         return URLSession.shared.dataTask(with: request) { data, _, error in
-            guard let data else { return }
-            do {
-                let output = try JSONDecoder().decode(Output.self, from: data)
-                completed(output)
-            } catch {
-                print(error)
-            }
+            completed(Result<Output>(data, error))
         }
     }
 }

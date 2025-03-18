@@ -37,10 +37,14 @@ struct LoginView: View {
     }
 
     func loginNow() {
-        com.atproto.server.CreateSession.call(with: login.input) {
-            let accessJwt = $0.accessJwt
+        com.atproto.server.CreateSession.call(with: login.input) { result in
             DispatchQueue.main.async {
-                self.accessJwt = accessJwt
+                switch result {
+                case let .error(error):
+                    print(error)
+                case let .value(session):
+                    accessJwt = session.accessJwt
+                }
             }
         }.resume()
     }

@@ -15,17 +15,11 @@ extension Schema.ApiQuery {
 
     static func query(
         auth: String, with params: Parameters? = nil,
-        completed: @escaping @Sendable (Output) -> Void
+        completed: @escaping @Sendable (Result<Output>) -> Void
     ) -> URLSessionDataTask {
         let request = request(auth: auth, with: params)
         return URLSession.shared.dataTask(with: request) { data, _, error in
-            guard let data else { return }
-            do {
-                let result = try JSONDecoder().decode(Output.self, from: data)
-                DispatchQueue.main.async { completed(result) }
-            } catch {
-                print(error)
-            }
+            completed(Result<Output>(data, error))
         }
     }
 }
