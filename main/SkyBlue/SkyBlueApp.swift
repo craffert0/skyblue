@@ -1,23 +1,21 @@
-//
-//  SkyBlueApp.swift
-//  SkyBlue
-//
-//  Created by Colin Rafferty on 3/17/25.
-//
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright (C) 2013 Colin Rafferty <colin@rafferty.net>
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct SkyBlueApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Login.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration =
+            ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(for: schema,
+                                      configurations: [modelConfiguration])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
