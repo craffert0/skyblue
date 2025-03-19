@@ -6,10 +6,11 @@ import SwiftUI
 
 struct LoginView: View {
     @Bindable var login: Login
-    @State var accessJwt: String?
+    @State var status: Status
 
     init(from login: Login) {
         self.login = login
+        status = .loggedOut
     }
 
     var body: some View {
@@ -31,20 +32,30 @@ struct LoginView: View {
                 }
                 .onSubmit { loginNow() }
             }
-            Text(accessJwt ?? "none")
+            switch status {
+            case .loggedOut:
+                Text("logged out")
+            case .loggingIn:
+                Text("logging in")
+            case let .connected(session):
+                Text(session.accessJwt)
+            }
             Button("Login") { loginNow() }
         }
     }
 
     func loginNow() {
+        status = .loggingIn
         com.atproto.server.CreateSession.call(with: login.input) { result in
             DispatchQueue.main.async {
                 switch result {
                 case let .value(session):
-                    accessJwt = session.accessJwt
+                    status = .connected(Session(from: session))
                 case let .http_error(error):
+                    status = .loggedOut
                     print(error)
                 case let .error(error):
+                    status = .loggedOut
                     print(error)
                 }
             }
