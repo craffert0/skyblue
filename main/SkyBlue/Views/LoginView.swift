@@ -48,13 +48,13 @@ struct LoginView: View {
         status = .loggingIn
         com.atproto.server.CreateSession.call(with: login.input) { result in
             DispatchQueue.main.async {
+                // TODO: Capture of 'result' with non-sendable type
+                // 'Result<CreateSession.Output, any Error>' in a `@Sendable`
+                // closure
                 switch result {
-                case let .value(session):
+                case let .success(session):
                     status = .connected(Session(from: session))
-                case let .http_error(error):
-                    status = .loggedOut
-                    print(error)
-                case let .error(error):
+                case let .failure(error):
                     status = .loggedOut
                     print(error)
                 }

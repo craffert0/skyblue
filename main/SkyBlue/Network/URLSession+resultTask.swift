@@ -7,10 +7,10 @@ import Schema
 extension URLSession {
     func resultTask<Output: ApiFunctionBody>(
         with request: URLRequest,
-        completed: @escaping @Sendable (Result<Output>) -> Void
+        completed: @escaping @Sendable (Result<Output, Error>) -> Void
     ) -> URLSessionDataTask {
         dataTask(with: request) { data, response, error in
-            completed(Result<Output>.from(data, response, error))
+            completed(Result<Output, Error>.from(data, response, error))
         }
     }
 }

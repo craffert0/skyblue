@@ -15,7 +15,7 @@ extension Schema.ApiProcedure11 {
 
     static func call(
         with input: Input, auth: String? = nil,
-        completed: @escaping @Sendable (Result<Output>) -> Void
+        completed: @escaping @Sendable (Result<Output, Error>) -> Void
     ) -> URLSessionDataTask {
         let request = request(with: input, auth: auth)
         return URLSession.shared.resultTask(with: request,
@@ -32,7 +32,7 @@ extension Schema.ApiProcedure01 {
 
     static func call(
         auth: String? = nil,
-        completed: @escaping @Sendable (Result<Output>) -> Void
+        completed: @escaping @Sendable (Result<Output, Error>) -> Void
     ) -> URLSessionDataTask {
         let request = request(auth: auth)
         return URLSession.shared.resultTask(with: request,

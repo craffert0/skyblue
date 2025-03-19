@@ -15,7 +15,7 @@ extension Schema.ApiQuery {
 
     static func query(
         auth: String, with params: Parameters? = nil,
-        completed: @escaping @Sendable (Result<Output>) -> Void
+        completed: @escaping @Sendable (Result<Output, Error>) -> Void
     ) -> URLSessionDataTask {
         let request = request(auth: auth, with: params)
         return URLSession.shared.resultTask(with: request,

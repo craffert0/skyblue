@@ -4,12 +4,6 @@
 import Foundation
 import Schema
 
-enum Result<T: ApiFunctionBody> {
-    case value(T)
-    case http_error(HttpError)
-    case error(Error)
-}
-
 extension JSONDecoder.DateDecodingStrategy {
     static let iso8601WithFractionalSeconds = custom { d in
         let raw = try d.singleValueContainer().decode(String.self)
@@ -25,27 +19,27 @@ extension JSONDecoder.DateDecodingStrategy {
     }
 }
 
-extension Result {
+extension Result where Success: ApiFunctionBody, Failure == any Error {
     static func from(_ data: Data?, _ response: URLResponse?,
-                     _ err: (any Error)?) -> Result
+                     _ error: (any Error)?) -> Result
     {
-        if let err {
-            return .error(err)
+        if let error {
+            return .failure(error)
         }
         let http_response = response as! HTTPURLResponse
         guard http_response.statusCode == 200 else {
-            return try! .http_error(
-                HttpError(
-                    statusCode: http_response.statusCode,
-                    body: JSONDecoder().decode(HttpError.Body.self, from: data!)
+            return try! .failure(
+              HttpError.http(
+                    http_response.statusCode,
+                    JSONDecoder().decode(HttpError.Body.self, from: data!)
                 ))
         }
         do {
             let d = JSONDecoder()
             d.dateDecodingStrategy = .iso8601WithFractionalSeconds
-            return try .value(d.decode(T.self, from: data!))
+            return try .success(d.decode(Success.self, from: data!))
         } catch {
-            return .error(error)
+            return .failure(error)
         }
     }
 }
