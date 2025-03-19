@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// Copyright (C) 2013 Colin Rafferty <colin@rafferty.net>
+// Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 import Foundation
 import Schema
@@ -7,10 +7,13 @@ import Schema
 extension URLSession {
     func resultTask<Output: ApiFunctionBody>(
         with request: URLRequest,
+        on q: DispatchQueue,
         completed: @escaping @Sendable (Result<Output, Error>) -> Void
     ) -> URLSessionDataTask {
         dataTask(with: request) { data, response, error in
-            completed(Result<Output, Error>.from(data, response, error))
+            q.async {
+                completed(Result<Output, Error>.from(data, response, error))
+            }
         }
     }
 }

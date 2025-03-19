@@ -1,22 +1,20 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// Copyright (C) 2013 Colin Rafferty <colin@rafferty.net>
+// Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 import Schema
 import SwiftUI
 
 struct LoginView: View {
-    @Bindable var login: Login
-    @State var status: Status
+    @ObservedObject var controller: LoginController
 
-    init(from login: Login) {
-        self.login = login
-        status = .loggedOut
+    init(with controller: LoginController) {
+        self.controller = controller
     }
 
     var body: some View {
         VStack {
             Form {
-                TextField(text: $login.identifier,
+                TextField(text: $controller.login.identifier,
                           prompt: Text("Username or email address"))
                 {
                     Text("Username")
@@ -25,14 +23,14 @@ struct LoginView: View {
                 .disableAutocorrection(true)
                 .onSubmit { loginNow() }
 
-                SecureField(text: $login.password,
+                SecureField(text: $controller.login.password,
                             prompt: Text("App password"))
                 {
                     Text("Password")
                 }
                 .onSubmit { loginNow() }
             }
-            switch status {
+            switch controller.status {
             case .loggedOut:
                 Text("logged out")
             case .loggingIn:
@@ -45,24 +43,10 @@ struct LoginView: View {
     }
 
     func loginNow() {
-        status = .loggingIn
-        com.atproto.server.CreateSession.call(with: login.input) { result in
-            DispatchQueue.main.async {
-                // TODO: Capture of 'result' with non-sendable type
-                // 'Result<CreateSession.Output, any Error>' in a `@Sendable`
-                // closure
-                switch result {
-                case let .success(session):
-                    status = .connected(Session(from: session))
-                case let .failure(error):
-                    status = .loggedOut
-                    print(error)
-                }
-            }
-        }.resume()
+        controller.loginNow()
     }
 }
 
 #Preview {
-    LoginView(from: Login())
+    LoginView(with: LoginController())
 }

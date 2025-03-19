@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-// Copyright (C) 2013 Colin Rafferty <colin@rafferty.net>
+// Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 import SwiftData
 import SwiftUI
 
 @main
 struct SkyBlueApp: App {
+    var controller = LoginController()
+
+    // TODO: This seems excessive. Why not direct?
+    // https://developer.apple.com/documentation/swiftdata/preserving-your-apps-model-data-across-launches
+    // Or maybe Login is really `Foundation.UserDefaults`
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Login.self,
@@ -23,7 +28,7 @@ struct SkyBlueApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(with: controller)
         }
         .modelContainer(sharedModelContainer)
     }
