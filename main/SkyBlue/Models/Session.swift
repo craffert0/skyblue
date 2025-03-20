@@ -14,7 +14,5 @@ class Session {
         did = creds.did
         accessJwt = creds.accessJwt
         refreshJwt = creds.refreshJwt
-
-        print(creds)
     }
 }

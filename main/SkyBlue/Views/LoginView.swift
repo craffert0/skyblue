@@ -5,6 +5,7 @@ import Schema
 import SwiftUI
 
 struct LoginView: View {
+    @Bindable var login = SwiftDataService.shared.login
     @ObservedObject var controller: LoginController
 
     init(with controller: LoginController) {
@@ -14,21 +15,21 @@ struct LoginView: View {
     var body: some View {
         VStack {
             Form {
-                TextField(text: $controller.login.identifier,
+                TextField(text: $login.identifier,
                           prompt: Text("Username or email address"))
                 {
                     Text("Username")
                 }
                 .textInputAutocapitalization(.never)
                 .disableAutocorrection(true)
-                .onSubmit { loginNow() }
+                .onSubmit { controller.login(login.input) }
 
-                SecureField(text: $controller.login.password,
+                SecureField(text: $login.password,
                             prompt: Text("App password"))
                 {
                     Text("Password")
                 }
-                .onSubmit { loginNow() }
+                .onSubmit { controller.login(login.input) }
             }
             switch controller.status {
             case .loggedOut:
@@ -38,12 +39,8 @@ struct LoginView: View {
             case let .connected(session):
                 Text(session.accessJwt)
             }
-            Button("Login") { loginNow() }
+            Button("Login") { controller.login(login.input) }
         }
-    }
-
-    func loginNow() {
-        controller.loginNow()
     }
 }
 

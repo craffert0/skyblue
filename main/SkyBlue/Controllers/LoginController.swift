@@ -6,15 +6,15 @@ import Schema
 import SwiftUI
 
 class LoginController: ObservableObject {
+    typealias CreateSession = com.atproto.server.CreateSession
+
     @Published var status: Status = .loggedOut
-    // TODO: This should be a @Query, but also needs to be bindable. Maybe:
     // https://medium.com/@dikidwid0/implement-swiftdata-in-swiftui-using-mvvm-architecture-pattern-aa3a9973c87c
-    @Bindable var login = Login()
     var timeline = TimelineController()
 
-    func loginNow() {
+    func login(_ input: CreateSession.Input) {
         status = .loggingIn
-        com.atproto.server.CreateSession.call(with: login.input,
+        com.atproto.server.CreateSession.call(with: input,
                                               on: DispatchQueue.main)
         {
             [weak self] result in

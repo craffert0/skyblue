@@ -21,7 +21,6 @@ class TimelineController: ObservableObject {
 
     private func load() {
         guard let session else { return }
-        print(cursor ?? "none")
         let params = GetTimeline.Parameters(cursor: cursor, limit: 10)
         GetTimeline.query(auth: session.accessJwt, with: params,
                           on: DispatchQueue.main)
