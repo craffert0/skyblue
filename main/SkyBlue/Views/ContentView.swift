@@ -6,14 +6,19 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    var controller: LoginController
+    @ObservedObject var controller: LoginController
 
     init(with controller: LoginController) {
         self.controller = controller
     }
 
     var body: some View {
-        LoginView(with: controller)
+        switch controller.status {
+        case .loggedOut, .loggingIn:
+            LoginView(with: controller)
+        case .connected:
+            FeedView(from: controller.timeline)
+        }
     }
 }
 

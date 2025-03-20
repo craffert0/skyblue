@@ -10,6 +10,7 @@ class LoginController: ObservableObject {
     // TODO: This should be a @Query, but also needs to be bindable. Maybe:
     // https://medium.com/@dikidwid0/implement-swiftdata-in-swiftui-using-mvvm-architecture-pattern-aa3a9973c87c
     @Bindable var login = Login()
+    var timeline = TimelineController()
 
     func loginNow() {
         status = .loggingIn
@@ -19,7 +20,9 @@ class LoginController: ObservableObject {
             [weak self] result in
             switch result {
             case let .success(session):
-                self?.status = .connected(Session(from: session))
+                let session = Session(from: session)
+                self?.status = .connected(session)
+                self?.timeline.loadInitialTimeline(with: session)
             case let .failure(error):
                 self?.status = .loggedOut
                 print(error)

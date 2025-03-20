@@ -5,19 +5,22 @@ import Schema
 import SwiftUI
 
 struct FeedView: View {
-    @State var model: FeedModel
+    @ObservedObject var controller: TimelineController
 
-    init(from model: FeedModel) {
-        self.model = model
+    init(from controller: TimelineController) {
+        self.controller = controller
     }
 
     var body: some View {
-        ScrollView(.vertical) {
-            VStack {
-                ForEach(model.feed) {
-                    FeedViewPostView($0)
+        VStack {
+            ScrollView(.vertical) {
+                VStack {
+                    ForEach(controller.feed) {
+                        FeedViewPostView($0)
+                    }
                 }
             }
+            Button("More") { controller.more() }
         }
     }
 }
