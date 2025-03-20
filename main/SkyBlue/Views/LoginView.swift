@@ -31,14 +31,6 @@ struct LoginView: View {
                 }
                 .onSubmit { controller.login(login.input) }
             }
-            switch controller.status {
-            case .loggedOut:
-                Text("logged out")
-            case .loggingIn:
-                Text("logging in")
-            case let .connected(session):
-                Text(session.accessJwt)
-            }
             Button("Login") { controller.login(login.input) }
         }
     }

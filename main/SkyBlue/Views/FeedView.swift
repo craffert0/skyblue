@@ -12,15 +12,23 @@ struct FeedView: View {
     }
 
     var body: some View {
-        VStack {
-            ScrollView(.vertical) {
-                VStack {
-                    ForEach(controller.feed) {
-                        FeedViewPostView($0)
+        ZStack(alignment: .center) {
+            VStack {
+                ScrollView(.vertical) {
+                    LazyVStack {
+                        ForEach(controller.feed) {
+                            FeedViewPostView($0)
+                        }
                     }
                 }
+                Button("More") { controller.more() }
             }
-            Button("More") { controller.more() }
+            if controller.isLoading {
+                ProgressView()
+            } else if let errorMessage = controller.errorMessage {
+                Label(errorMessage, systemImage: "snow")
+                    .border(Color.red)
+            }
         }
     }
 }
