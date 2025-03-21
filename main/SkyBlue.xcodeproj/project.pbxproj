@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3B064B572D89ED9D006AEE9A /* Schema in Frameworks */ = {isa = PBXBuildFile; productRef = 3B064B562D89ED9D006AEE9A /* Schema */; };
+		3BE643CD2D8DFAB80066B98B /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = 3BE643CC2D8DFAB80066B98B /* Model */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,6 +33,7 @@
 		3B2FA32B2D886EBF00B73219 /* SkyBlueTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkyBlueTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B2FA3352D886EBF00B73219 /* SkyBlueUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkyBlueUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BE458352D89B1F8000A0328 /* Schema */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Schema; sourceTree = "<group>"; };
+		3BE643CA2D8DF8940066B98B /* Model */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Model; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -57,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BE643CD2D8DFAB80066B98B /* Model in Frameworks */,
 				3B064B572D89ED9D006AEE9A /* Schema in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -81,6 +84,7 @@
 		3B2FA30F2D886EBE00B73219 = {
 			isa = PBXGroup;
 			children = (
+				3BE643CA2D8DF8940066B98B /* Model */,
 				3BE458352D89B1F8000A0328 /* Schema */,
 				3B2FA31A2D886EBE00B73219 /* SkyBlue */,
 				3B2FA32E2D886EBF00B73219 /* SkyBlueTests */,
@@ -120,6 +124,7 @@
 			name = SkyBlue;
 			packageProductDependencies = (
 				3B064B562D89ED9D006AEE9A /* Schema */,
+				3BE643CC2D8DFAB80066B98B /* Model */,
 			);
 			productName = SkyBlue;
 			productReference = 3B2FA3182D886EBE00B73219 /* SkyBlue.app */;
@@ -205,6 +210,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				3B064B552D89ED9D006AEE9A /* XCLocalSwiftPackageReference "Schema" */,
+				3BE643CB2D8DFAB80066B98B /* XCLocalSwiftPackageReference "Model" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3B2FA3192D886EBE00B73219 /* Products */;
@@ -608,12 +614,20 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Schema;
 		};
+		3BE643CB2D8DFAB80066B98B /* XCLocalSwiftPackageReference "Model" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Model;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		3B064B562D89ED9D006AEE9A /* Schema */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Schema;
+		};
+		3BE643CC2D8DFAB80066B98B /* Model */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Model;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
