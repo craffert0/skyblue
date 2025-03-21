@@ -20,7 +20,9 @@ struct LoginView: View {
                 {
                     Text("Username")
                 }
+                #if os(iOS)
                 .textInputAutocapitalization(.never)
+                #endif
                 .disableAutocorrection(true)
                 .onSubmit { controller.login(login.input) }
 

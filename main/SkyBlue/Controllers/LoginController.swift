@@ -2,6 +2,7 @@
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 import Foundation
+import Model
 import Schema
 import SwiftUI
 
