@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
-import Foundation
+import Combine
+import Dispatch
 import Model
 import Schema
-import SwiftUI
 
 class LoginController: ObservableObject {
     typealias CreateSession = com.atproto.server.CreateSession
