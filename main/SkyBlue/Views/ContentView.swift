@@ -7,7 +7,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @ObservedObject var controller: LoginController
+    var controller: LoginController
 
     init(with controller: LoginController) {
         self.controller = controller

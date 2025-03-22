@@ -5,7 +5,7 @@ import Schema
 import SwiftUI
 
 struct FeedView: View {
-    @ObservedObject var controller: TimelineController
+    var controller: TimelineController
 
     init(from controller: TimelineController) {
         self.controller = controller

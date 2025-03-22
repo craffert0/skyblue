@@ -4,12 +4,13 @@
 import Combine
 import Dispatch
 import Model
+import Observation
 import Schema
 
-class LoginController: ObservableObject {
+@Observable class LoginController  {
     typealias CreateSession = com.atproto.server.CreateSession
 
-    @Published var status: Status = .loggedOut
+    var status: Status = .loggedOut
     // https://medium.com/@dikidwid0/implement-swiftdata-in-swiftui-using-mvvm-architecture-pattern-aa3a9973c87c
     var timeline = TimelineController()
 

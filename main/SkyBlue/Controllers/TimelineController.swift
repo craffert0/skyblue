@@ -4,15 +4,16 @@
 import Combine
 import Dispatch
 import Model
+import Observation
 import Schema
 
-class TimelineController: ObservableObject {
+@Observable class TimelineController {
     typealias FeedViewPost = app.bsky.feed.defs.FeedViewPost
     private typealias GetTimeline = app.bsky.feed.GetTimeline
 
-    @Published var feed: [FeedViewPost] = []
-    @Published var isLoading: Bool = false
-    @Published var errorMessage: String? = nil
+    var feed: [FeedViewPost] = []
+    var isLoading: Bool = false
+    var errorMessage: String? = nil
 
     private var session: Session?
     private var cursor: String?

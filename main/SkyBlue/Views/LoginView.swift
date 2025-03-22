@@ -6,7 +6,7 @@ import SwiftUI
 
 struct LoginView: View {
     @Bindable var login = SwiftDataService.shared.login
-    @ObservedObject var controller: LoginController
+    var controller: LoginController
 
     init(with controller: LoginController) {
         self.controller = controller
