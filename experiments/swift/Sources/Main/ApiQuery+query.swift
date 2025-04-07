@@ -1,8 +1,8 @@
 import Foundation
-import Proto
 import RealHTTP
+import Schema
 
-extension ApiQuery {
+extension Schema.ApiQuery {
     static func query(
         auth: String,
         with params: Parameters? = nil

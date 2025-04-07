@@ -2,7 +2,7 @@
 
 all: test experiments
 
-test: test_experiments test_codegen
+test: test_experiments test_codegen test_schema
 
 lint:
 	tools/reformat.py
@@ -22,13 +22,23 @@ test_codegen:
 
 LEXICON_DIR := ../atproto/lexicons
 
-GENERATION_DIR := experiments/swift/Sources/Proto/generated
+GENERATION_DIR := main/Schema/Sources/Schema/Generated
 GENERATION_ENUM := $(GENERATION_DIR)/TopEnum.swift
 
 $(GENERATION_ENUM): $(CODEGEN_APP)
 	$(CODEGEN_APP) $(LEXICON_DIR) $(GENERATION_DIR)
 
 codegen: $(GENERATION_ENUM)
+
+## Test the Schema 
+
+SCHEMA_MODULE := main/Schema/.build/debug/Schema.build/Schema.emit-module.d
+SCHEMA_FILES := $(shell find main/Schema/Sources -type f -name '*.swift') main/Schema/Package.swift
+$(SCHEMA_MODULE): $(SCHEMA_FILES) $(GENERATION_ENUM)
+	cd main/Schema ; swift build
+
+test_schema: $(GENERATION_ENUM)
+	cd main/Schema ; swift test
 
 ## Build and test the experiments app
 
@@ -37,10 +47,10 @@ EXPERIMENTS_FILES := $(shell find experiments/swift/Sources -type f -name '*.swi
 
 experiments: $(EXPERIMENTS_APP)
 
-$(EXPERIMENTS_APP): $(EXPERIMENTS_FILES) $(GENERATION_ENUM)
+$(EXPERIMENTS_APP): $(EXPERIMENTS_FILES) $(SCHEMA_MODULE)
 	cd experiments/swift ; swift build
 
-test_experiments: $(GENERATION_ENUM)
+test_experiments: $(SCHEMA_MODULE)
 	cd experiments/swift ; swift test
 
 experiment_prefs: $(EXPERIMENTS_APP)

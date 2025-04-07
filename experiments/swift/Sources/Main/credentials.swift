@@ -1,7 +1,7 @@
 import Foundation
-import Proto
+import Schema
 
-typealias Credentials = Proto.com.atproto.server.CreateSession.Input
+typealias Credentials = Schema.com.atproto.server.CreateSession.Input
 
 extension Credentials {
     static func decode(from filePath: String) throws -> Credentials {
