@@ -16,7 +16,8 @@ extension Result where Success: ApiFunctionBody, Failure == any Error {
             return try! .failure(
                 HttpError.http(
                     http_response.statusCode,
-                    JSONDecoder().decode(HttpError.Body.self, from: data!)
+                    JSONDecoder().decode(HttpError.Body.self, from: data!),
+                    http_response.allHeaderFields
                 ))
         }
         do {

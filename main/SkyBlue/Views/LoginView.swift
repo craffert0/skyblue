@@ -5,39 +5,63 @@ import Schema
 import SwiftUI
 
 struct LoginView: View {
-    @Bindable var login = SwiftDataService.shared.login
-    var controller: LoginController
-
-    init(with controller: LoginController) {
-        self.controller = controller
+    @ObservedObject var preferences = PreferencesModel.global
+    var password: Binding<String> {
+        Binding {
+            preferences.password
+        } set: {
+            preferences.password = $0
+        }
     }
 
-    var body: some View {
-        VStack {
-            Form {
-                TextField(text: $login.identifier,
-                          prompt: Text("Username or email address"))
-                {
-                    Text("Username")
-                }
-                #if os(iOS)
-                .textInputAutocapitalization(.never)
-                #endif
-                .disableAutocorrection(true)
-                .onSubmit { controller.login(login.input) }
+    var service: BlueskyService
+    @State var error: LoginError?
+    @State var showsError = false
 
-                SecureField(text: $login.password,
-                            prompt: Text("App password"))
-                {
-                    Text("Password")
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField(text: preferences.$identifier,
+                              prompt: Text("Username or email address"))
+                    {
+                        Text("Username")
+                    }
+                    #if os(iOS)
+                    .textInputAutocapitalization(.never)
+                    #endif
+                    .disableAutocorrection(true)
+                    .onSubmit { login() }
+
+                    SecureField(text: password,
+                                prompt: Text("App password"))
+                    {
+                        Text("Password")
+                    }
+                    .onSubmit { login() }
+                } header: {
+                    Text("Account")
                 }
-                .onSubmit { controller.login(login.input) }
+            }.navigationTitle("BlueSky Login")
+            Button("Login") { login() }
+        }
+        .alert(isPresented: $showsError, error: error) {}
+    }
+
+    func login() {
+        Task {
+            await service.login(as: preferences.identifier,
+                                with: preferences.password)
+            DispatchQueue.main.async {
+                if case let .failed(error) = service.status {
+                    self.error = error as? LoginError ?? .otherError(error: error)
+                    showsError = true
+                }
             }
-            Button("Login") { controller.login(login.input) }
         }
     }
 }
 
 #Preview {
-    LoginView(with: LoginController())
+    LoginView(service: BlueskyService())
 }

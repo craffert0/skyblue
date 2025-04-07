@@ -7,23 +7,17 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    var controller: LoginController
-
-    init(with controller: LoginController) {
-        self.controller = controller
-    }
+    var service: BlueskyService
 
     var body: some View {
-        switch controller.status {
-        case .loggedOut, .loggingIn:
-            LoginView(with: controller)
-        case .connected:
-            FeedView(from: controller.timeline)
+        if case let .connected(session) = service.status {
+            FeedView(session: session)
+        } else {
+            LoginView(service: service)
         }
     }
 }
 
 #Preview {
-    ContentView(with: LoginController())
-        .modelContainer(for: Login.self, inMemory: true)
+    ContentView(service: BlueskyService())
 }

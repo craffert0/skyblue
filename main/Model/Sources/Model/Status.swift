@@ -4,5 +4,6 @@
 public enum Status {
     case loggedOut
     case loggingIn
+    case failed(Error)
     case connected(Session)
 }

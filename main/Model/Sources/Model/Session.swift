@@ -10,7 +10,13 @@ public class Session {
     public var accessJwt: String
     public var refreshJwt: String
 
-    public init(from creds: CreateSession.Output) {
+    public protocol Credentials {
+        var did: String { get }
+        var accessJwt: String { get }
+        var refreshJwt: String { get }
+    }
+
+    public init(from creds: Credentials) {
         did = creds.did
         accessJwt = creds.accessJwt
         refreshJwt = creds.refreshJwt

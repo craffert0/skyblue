@@ -8,16 +8,19 @@ import Observation
 import Schema
 
 @Observable class TimelineController {
+    static var global = TimelineController()
+
     typealias FeedViewPost = app.bsky.feed.defs.FeedViewPost
     private typealias GetTimeline = app.bsky.feed.GetTimeline
 
     var feed: [FeedViewPost] = []
     var isLoading: Bool = false
-    var errorMessage: String? = nil
+    var errorMessage: String?
 
     private var session: Session?
     private var cursor: String?
 
+    // TODO: these should all be @MainActor & async
     func loadInitialTimeline(with session: Session) {
         self.session = session
         load()

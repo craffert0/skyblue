@@ -5,11 +5,11 @@ import SwiftUI
 
 @main
 struct SkyBlueApp: App {
-    var controller = LoginController()
+    let service = BlueskyService.global
 
     var body: some Scene {
         WindowGroup {
-            ContentView(with: controller)
+            ContentView(service: service)
         }
     }
 }

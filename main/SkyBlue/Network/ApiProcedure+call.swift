@@ -22,6 +22,13 @@ extension Schema.ApiProcedure11 {
         return URLSession.shared.resultTask(with: request, on: q,
                                             completed: completed)
     }
+
+    static func call(
+        with input: Input, auth: String? = nil
+    ) async throws -> Output {
+        let request = request(with: input, auth: auth)
+        return try await URLSession.shared.output(for: request)
+    }
 }
 
 extension Schema.ApiProcedure01 {
@@ -39,5 +46,10 @@ extension Schema.ApiProcedure01 {
         let request = request(auth: auth)
         return URLSession.shared.resultTask(with: request, on: q,
                                             completed: completed)
+    }
+
+    static func call(auth: String? = nil) async throws -> Output {
+        let request = request(auth: auth)
+        return try await URLSession.shared.output(for: request)
     }
 }

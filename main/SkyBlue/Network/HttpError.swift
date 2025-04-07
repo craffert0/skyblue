@@ -2,7 +2,7 @@
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 enum HttpError: Error {
-    case http(Int, Body)
+    case http(Int, Body, [AnyHashable: Any])
 
     struct Body: Codable {
         let error: String?
