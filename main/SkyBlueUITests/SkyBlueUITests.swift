@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
+
 //
 //  SkyBlueUITests.swift
 //  SkyBlueUITests
@@ -8,7 +11,6 @@
 import XCTest
 
 final class SkyBlueUITests: XCTestCase {
-
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
 
