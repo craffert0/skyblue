@@ -1,3 +1,3 @@
-public struct Bytes: Codable {
+@frozen public struct Bytes: Codable {
     // TODO:
 }

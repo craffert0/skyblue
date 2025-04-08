@@ -1,7 +1,7 @@
 // TODO: This needs to be updated to have many more cases, or even actually
 // doing it properly.
 
-public enum Unknown: Codable {
+@frozen public enum Unknown: Codable {
     case post(app.bsky.feed.post.Main)
     case threadgate(app.bsky.feed.threadgate.Main)
     case starterpack(app.bsky.graph.starterpack.Main)

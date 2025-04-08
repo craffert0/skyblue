@@ -126,9 +126,9 @@ struct Generator {
                 .map { $0[1 ..< $0.count].map { String($0) } }
                 .filter { !$0.isEmpty }
             if subset.isEmpty {
-                p.println("public enum \(first) {}")
+                p.println("@frozen public enum \(first) {}")
             } else {
-                p.open("public enum \(first)") {
+                p.open("@frozen public enum \(first)") {
                     generateEnum(from: Set(subset), into: p)
                 }
             }

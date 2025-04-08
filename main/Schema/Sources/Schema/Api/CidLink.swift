@@ -1,3 +1,3 @@
-public struct CidLink: Codable {
+@frozen public struct CidLink: Codable {
     // TODO:
 }

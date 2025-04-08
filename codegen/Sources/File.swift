@@ -28,7 +28,7 @@ class File: Decodable {
                 p.newline()
             }
 
-            p.open("public enum \(name)") {
+            p.open("@frozen public enum \(name)") {
                 for k in defs.keys.sorted() {
                     defs[k]?.emit(k, p)
                     p.newline()

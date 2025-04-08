@@ -1,6 +1,6 @@
 import Foundation
 
-public enum Nullable<T: Codable>: Codable {
+@frozen public enum Nullable<T: Codable & Sendable>: Codable {
     case null
     case value(T)
 

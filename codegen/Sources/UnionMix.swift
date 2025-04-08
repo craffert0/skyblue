@@ -6,7 +6,7 @@ class UnionMix: Decodable {
     let description: String?
 
     func emit(_ name: String, _ p: Printer) {
-        p.open("public enum \(name): Codable") {
+        p.open("@frozen public enum \(name): Codable") {
             emit_cases(p)
             p.newline()
             emit_init(p)
