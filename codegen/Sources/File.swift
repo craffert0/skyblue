@@ -24,7 +24,7 @@ class File: Decodable {
         let ext = namespace.joined(separator: ".")
         p.open("extension \(ext)") {
             if defs["main"] != nil {
-                p.println("public typealias \(to_upper(name)) = \(name).Main")
+                p.println("public typealias \(name.upper) = \(name).Main")
                 p.newline()
             }
 

@@ -15,7 +15,7 @@ class UnionMix: Decodable {
 
     private func emit_cases(_ p: Printer) {
         for t in refs {
-            p.println("case \(t.case_name(inNamespace: p.namespace))(\(t.full_name))")
+            p.println("case \(t.case_name)(\(t.full_name))")
         }
         p.println("case unknown(String)")
     }
@@ -27,7 +27,7 @@ class UnionMix: Decodable {
                 for t in refs {
                     p.println("case \"\(t.json_name(inNamespace: p.namespace))\":")
                     p.indent()
-                    p.println("self = try .\(t.case_name(inNamespace: p.namespace))(decoder.singleValueContainer().decode(\(t.full_name).self))")
+                    p.println("self = try .\(t.case_name)(decoder.singleValueContainer().decode(\(t.full_name).self))")
                     p.outdent()
                 }
                 p.println("default:")
