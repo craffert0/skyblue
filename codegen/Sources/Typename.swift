@@ -1,23 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
-enum SchemaError: Error {
-    case invalidTypeName(name: String)
-    case invalidDefinitionName(name: String)
-}
-
-func to_upper(_ s: some StringProtocol) -> String {
-    s.first!.uppercased() + s.suffix(s.count - 1)
-}
-
-func to_lower(_ s: some StringProtocol) -> String {
-    s.first!.lowercased() + s.suffix(s.count - 1)
-}
-
-class TypeDecoder: Decodable {
-    let type: String
-}
-
 class Typename: Decodable {
     let json_name: String
     let full_name: String
@@ -35,10 +18,10 @@ class Typename: Decodable {
         case 1:
             let full = name.split(separator: ".")
             namespace = full[0 ..< full.count - 1].joined(separator: ".")
-            short_name = to_upper(full.last!)
+            short_name = full.last!.upper
             full_name = namespace! + "." + short_name
         case 2:
-            short_name = to_upper(pieces[1])
+            short_name = pieces[1].upper
             if pieces[0].count == 0 {
                 namespace = nil
                 full_name = short_name
@@ -57,10 +40,10 @@ class Typename: Decodable {
 
     var case_name: String {
         if let namespace {
-            (namespace + "." + to_lower(short_name))
+            (namespace + "." + short_name.lower)
                 .replacingOccurrences(of: ".", with: "_")
         } else {
-            to_lower(short_name)
+            short_name.lower
         }
     }
 }

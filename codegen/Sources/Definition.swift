@@ -179,7 +179,7 @@ class QueryDefinition: Decodable {
 
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
-        let class_name = to_upper(name)
+        let class_name = name.upper
         if let description {
             p.comment(description)
         }
@@ -202,7 +202,7 @@ class ProcedureDefinition: Decodable {
 
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
-        let class_name = to_upper(name)
+        let class_name = name.upper
         if let description {
             p.comment(description)
         }
@@ -256,7 +256,7 @@ class SubscriptionDefinition: Decodable {
 
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
-        let class_name = to_upper(name)
+        let class_name = name.upper
 
         p.open("public final class \(class_name): ApiSubscription") {
             p.println("public static let apiPath = \"\(p.namespace)\"")
@@ -281,7 +281,7 @@ class ObjectDefinition: Decodable {
 
     func emit(_ name: String, _ p: Printer) {
         let definitions = Definitions()
-        let class_name = to_upper(name)
+        let class_name = name.upper
         p.open("public final class \(class_name): Codable, Sendable") {
             emit_properties(p, class_name, definitions, false)
         }
@@ -307,7 +307,7 @@ class RecordDefinition: Decodable {
         if let description {
             p.comment(description)
         }
-        let class_name = to_upper(name)
+        let class_name = name.upper
         p.open("public final class \(class_name): Codable, Sendable") {
             record.emit_properties(p, class_name, definitions, false)
         }
@@ -321,7 +321,7 @@ class StringDefinition: Decodable {
     let maxGraphemes: Int?
 
     func emit(_ name: String, _ p: Printer) {
-        p.println("public typealias \(to_upper(name)) = String")
+        p.println("public typealias \(name.upper) = String")
     }
 }
 
@@ -337,7 +337,7 @@ class ArrayDefinition: Decodable {
     let items: Definition
 
     func emit(_ name: String, _ p: Printer) {
-        let upper = to_upper(name)
+        let upper = name.upper
         let element_name = upper + "_element"
         p.println("public typealias \(upper) = [\(element_name)]")
         p.newline()
