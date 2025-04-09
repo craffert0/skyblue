@@ -11,15 +11,15 @@ struct FeedView: View {
 
     var body: some View {
         ZStack(alignment: .center) {
-            VStack {
-                ScrollView(.vertical) {
-                    LazyVStack {
-                        ForEach(controller.feed) {
-                            FeedViewPostView($0)
-                        }
+            ScrollView(.vertical) {
+                LazyVStack {
+                    ForEach(controller.feed) { p in
+                        FeedViewPostView(p)
+                            .onAppear {
+                                controller.loadMoreIfNeeded(currentPost: p)
+                            }
                     }
                 }
-                Button("More") { controller.more() }
             }
             if controller.isLoading {
                 ProgressView()
