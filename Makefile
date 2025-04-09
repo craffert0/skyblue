@@ -3,7 +3,7 @@
 
 .PHONY: codegen
 
-all: test experiments
+all: test experiments top
 
 test: test_experiments test_codegen test_schema
 
@@ -46,7 +46,7 @@ test_schema: $(GENERATION_ENUM)
 ## Build and test the experiments app
 
 EXPERIMENTS_APP := experiments/swift/.build/debug/Main
-EXPERIMENTS_FILES := $(shell find experiments/swift/Sources -type f -name '*.swift') experiments/swift/Package.swift
+EXPERIMENTS_FILES := $(shell find experiments/swift/Sources/Main -type f -name '*.swift') experiments/swift/Package.swift
 
 experiments: $(EXPERIMENTS_APP)
 
@@ -64,3 +64,20 @@ experiment_author: $(EXPERIMENTS_APP)
 
 experiment_timeline: $(EXPERIMENTS_APP)
 	$(EXPERIMENTS_APP) timeline ~/.skybluerc
+
+TOP_APP := experiments/swift/.build/debug/Top
+TOP_FILES := $(shell find experiments/swift/Sources/Top -type f -name '*.swift') experiments/swift/Package.swift
+
+top: $(TOP_APP)
+
+top10: $(TOP_APP)
+	$(TOP_APP) ~/Documents/cursed/top10.json
+
+top100: $(TOP_APP)
+	$(TOP_APP) ~/Documents/cursed/top100.json
+
+top1000: $(TOP_APP)
+	$(TOP_APP) ~/Documents/cursed/top1000.json
+
+$(TOP_APP): $(TOP_FILES) $(SCHEMA_MODULE)
+	cd experiments/swift ; swift build

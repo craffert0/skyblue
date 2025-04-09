@@ -31,6 +31,14 @@ let package = Package(
                 "Proto",
             ]
         ),
+        .executableTarget(
+            name: "Top",
+            dependencies: [
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Schema", package: "schema"),
+                "Proto",
+            ]
+        ),
         .testTarget(
             name: "MainTests",
             dependencies: ["Main"]
