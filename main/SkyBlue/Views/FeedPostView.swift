@@ -25,8 +25,10 @@ struct FeedViewPostView: View {
 
     var body: some View {
         VStack {
-            Text(feed_post.post.author.my_name)
-            Text(feed_post.post.indexedAt.formatted())
+            HStack {
+                Text(feed_post.post.indexedAt.relative())
+                Text(feed_post.post.author.my_name)
+            }
             if let feedContext = feed_post.feedContext {
                 Text(feedContext)
             }
