@@ -55,8 +55,12 @@ class Typename: Decodable {
         namespace == nil ? ns + json_name : json_name
     }
 
-    func case_name(inNamespace ns: String) -> String {
-        let fqcn = (namespace ?? ns) + "." + to_lower(short_name)
-        return fqcn.replacingOccurrences(of: ".", with: "_")
+    var case_name: String {
+        if let namespace {
+            (namespace + "." + to_lower(short_name))
+                .replacingOccurrences(of: ".", with: "_")
+        } else {
+            to_lower(short_name)
+        }
     }
 }
