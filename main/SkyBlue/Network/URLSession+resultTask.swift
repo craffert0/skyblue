@@ -23,14 +23,11 @@ extension URLSession {
     ) async throws -> Output {
         let (data, response) =
             try await data(for: request, delegate: delegate)
-        let http_response = response as! HTTPURLResponse
-        let d = JSONDecoder()
-        d.dateDecodingStrategy = .iso8601WithFractionalSeconds
-        guard http_response.statusCode == 200 else {
-            let body = try d.decode(HttpError.Body.self, from: data)
-            throw HttpError.http(http_response.statusCode, body,
-                                 http_response.allHeaderFields)
+        switch Result<Output, Error>.from(data, response) {
+        case let .success(output):
+            return output
+        case let .failure(error):
+            throw error
         }
-        return try d.decode(Output.self, from: data)
     }
 }
