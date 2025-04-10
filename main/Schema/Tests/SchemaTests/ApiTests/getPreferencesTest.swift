@@ -384,6 +384,10 @@ import Testing
         ]
     }
     """
-    let result = try! JSONDecoder().decode(app.bsky.actor.GetPreferences.Output.self, from: Data(input.utf8))
-    #expect(result != nil)
+    #expect(throws: Never.self) {
+        _ = try! JSONDecoder().decode(
+            app.bsky.actor.GetPreferences.Output.self,
+            from: Data(input.utf8)
+        )
+    }
 }

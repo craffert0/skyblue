@@ -9,7 +9,7 @@ struct Wrapper: Codable {
 }
 
 @Suite struct JSONDecoder_DateDecodingStrategyTest {
-    func parse(_ s: String) throws -> Date {
+    func parse(_ s: any StringProtocol) throws -> Date {
         let d = JSONDecoder()
         d.dateDecodingStrategy = .iso8601WithFractionalSeconds
         return try d.decode(Wrapper.self,
@@ -49,6 +49,14 @@ struct Wrapper: Codable {
         ]
         for d in dates {
             #expect(try parse(d) == second(d))
+        }
+    }
+
+    @Test func atprotoDatetimeSyntaxValidTest() throws {
+        for line in try FileManager.default.lines(ofSyntax: "datetime_syntax_valid.txt") {
+            #expect(throws: Never.self) {
+                _ = try parse(line)
+            }
         }
     }
 }
