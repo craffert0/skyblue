@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
-import SkyBlueApi
+import BlueSkyApi
 
 // TODO: This needs to be updated to have many more cases, or even actually
 // doing it properly.

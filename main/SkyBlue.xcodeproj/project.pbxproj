@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3B064B572D89ED9D006AEE9A /* Schema in Frameworks */ = {isa = PBXBuildFile; productRef = 3B064B562D89ED9D006AEE9A /* Schema */; };
-		3B281BD92DB00DC5000026A1 /* SkyBlueApi in Frameworks */ = {isa = PBXBuildFile; productRef = 3B281BD82DB00DC5000026A1 /* SkyBlueApi */; };
+		3B281BDC2DB026FD000026A1 /* BlueSkyApi in Frameworks */ = {isa = PBXBuildFile; productRef = 3B281BDB2DB026FD000026A1 /* BlueSkyApi */; };
 		3BE643CD2D8DFAB80066B98B /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = 3BE643CC2D8DFAB80066B98B /* Model */; };
 /* End PBXBuildFile section */
 
@@ -62,7 +62,7 @@
 			files = (
 				3BE643CD2D8DFAB80066B98B /* Model in Frameworks */,
 				3B064B572D89ED9D006AEE9A /* Schema in Frameworks */,
-				3B281BD92DB00DC5000026A1 /* SkyBlueApi in Frameworks */,
+				3B281BDC2DB026FD000026A1 /* BlueSkyApi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,7 +127,7 @@
 			packageProductDependencies = (
 				3B064B562D89ED9D006AEE9A /* Schema */,
 				3BE643CC2D8DFAB80066B98B /* Model */,
-				3B281BD82DB00DC5000026A1 /* SkyBlueApi */,
+				3B281BDB2DB026FD000026A1 /* BlueSkyApi */,
 			);
 			productName = SkyBlue;
 			productReference = 3B2FA3182D886EBE00B73219 /* SkyBlue.app */;
@@ -214,7 +214,7 @@
 			packageReferences = (
 				3B064B552D89ED9D006AEE9A /* XCLocalSwiftPackageReference "Schema" */,
 				3BE643CB2D8DFAB80066B98B /* XCLocalSwiftPackageReference "Model" */,
-				3B281BD72DB00DC5000026A1 /* XCLocalSwiftPackageReference "SkyBlueApi" */,
+				3B281BDA2DB026FD000026A1 /* XCLocalSwiftPackageReference "BlueSkyApi" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3B2FA3192D886EBE00B73219 /* Products */;
@@ -622,9 +622,9 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Schema;
 		};
-		3B281BD72DB00DC5000026A1 /* XCLocalSwiftPackageReference "SkyBlueApi" */ = {
+		3B281BDA2DB026FD000026A1 /* XCLocalSwiftPackageReference "BlueSkyApi" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = SkyBlueApi;
+			relativePath = BlueSkyApi;
 		};
 		3BE643CB2D8DFAB80066B98B /* XCLocalSwiftPackageReference "Model" */ = {
 			isa = XCLocalSwiftPackageReference;
@@ -637,9 +637,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = Schema;
 		};
-		3B281BD82DB00DC5000026A1 /* SkyBlueApi */ = {
+		3B281BDB2DB026FD000026A1 /* BlueSkyApi */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = SkyBlueApi;
+			productName = BlueSkyApi;
 		};
 		3BE643CC2D8DFAB80066B98B /* Model */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -6,19 +6,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "SkyBlueApi",
+    name: "BlueSkyApi",
     products: [
         .library(
-            name: "SkyBlueApi",
-            targets: ["SkyBlueApi"]
+            name: "BlueSkyApi",
+            targets: ["BlueSkyApi"]
         ),
     ],
     targets: [
         .target(
-            name: "SkyBlueApi"),
+            name: "BlueSkyApi"),
         .testTarget(
-            name: "SkyBlueApiTests",
-            dependencies: ["SkyBlueApi"]
+            name: "BlueSkyApiTests",
+            dependencies: ["BlueSkyApi"]
         ),
     ]
 )

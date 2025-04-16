@@ -15,21 +15,21 @@ let package = Package(
     ],
 
     dependencies: [
-        .package(path: "../SkyBlueApi"),
+        .package(path: "../BlueSkyApi"),
     ],
 
     targets: [
         .target(
             name: "Schema",
             dependencies: [
-                .product(name: "SkyBlueApi", package: "SkyBlueApi"),
+                .product(name: "BlueSkyApi", package: "BlueSkyApi"),
             ],
         ),
         .testTarget(
             name: "SchemaTests",
             dependencies: [
                 "Schema",
-                .product(name: "SkyBlueApi", package: "SkyBlueApi"),
+                .product(name: "BlueSkyApi", package: "BlueSkyApi"),
             ],
         ),
     ]

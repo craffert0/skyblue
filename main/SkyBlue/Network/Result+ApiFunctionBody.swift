@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
+import BlueSkyApi
 import Foundation
-import SkyBlueApi
 
 extension Result where Success: ApiFunctionBody, Failure == any Error {
     static func from(_ data: Data?, _ response: URLResponse?,

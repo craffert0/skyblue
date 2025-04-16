@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
+import BlueSkyApi
 import Foundation
 import RealHTTP
-import SkyBlueApi
 
 extension HTTPStatusCode: @retroactive Encodable {}
 
 enum Response<Type: Encodable>: Encodable {
     case value(Type)
-    case error(HTTPStatusCode, SkyBlueApi.ApiError)
+    case error(HTTPStatusCode, BlueSkyApi.ApiError)
 }
 
 extension HTTPResponse {
@@ -20,7 +20,7 @@ extension HTTPResponse {
             d.dateDecodingStrategy = .iso8601WithFractionalSeconds
             return try .value(d.decode(type, from: data ?? Data()))
         default:
-            return try .error(statusCode, decode(SkyBlueApi.ApiError.self))
+            return try .error(statusCode, decode(BlueSkyApi.ApiError.self))
         }
     }
 }

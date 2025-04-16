@@ -47,7 +47,7 @@ $(GENERATION_ENUM): $(CODEGEN_APP)
 codegen: $(GENERATION_ENUM)
 
 test_skyblueapi:
-	cd main/SkyBlueApi ; swift test
+	cd main/BlueSkyApi ; swift test
 
 ## Test the Schema 
 

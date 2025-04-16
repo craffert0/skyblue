@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
+import BlueSkyApi
 import Foundation
 @testable import Main
-import SkyBlueApi
 import Testing
 
-private struct MixedParameters: SkyBlueApi.ApiParameters {
+private struct MixedParameters: ApiParameters {
     let first: String
     let second: String?
     let third: Int
     let fourth: Int?
 }
 
-private struct NoParameters: SkyBlueApi.ApiParameters {}
+private struct NoParameters: ApiParameters {}
 
-private struct NullableParameters: SkyBlueApi.ApiParameters {
+private struct NullableParameters: ApiParameters {
     let first: String?
     let second: String?
 }

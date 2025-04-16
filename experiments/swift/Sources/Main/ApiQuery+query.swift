@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
+import BlueSkyApi
 import Foundation
 import RealHTTP
-import SkyBlueApi
 
-extension SkyBlueApi.ApiQuery {
+extension ApiQuery {
     static func query(
         auth: String,
         with params: Parameters? = nil
