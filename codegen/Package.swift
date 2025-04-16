@@ -2,7 +2,6 @@
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 // swift-tools-version: 6.0
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
@@ -10,14 +9,16 @@ let package = Package(
     name: "codegen",
     platforms: [.macOS(.v15)],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser",
+                 from: "1.3.0"),
         .package(path: "../main/BlueSkyApi"),
     ],
     targets: [
         .executableTarget(
             name: "codegen",
             dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "ArgumentParser",
+                         package: "swift-argument-parser"),
             ]
         ),
         .testTarget(
@@ -25,7 +26,10 @@ let package = Package(
             dependencies: [
                 "codegen",
                 .product(name: "BlueSkyApi", package: "BlueSkyApi"),
-            ]
+            ],
+            resources: [
+                .process("Inputs/Timeline.Output.1.json"),
+            ],
         ),
     ]
 )
