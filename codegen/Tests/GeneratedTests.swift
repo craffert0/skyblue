@@ -6,9 +6,9 @@ import Foundation
 import Testing
 
 @Suite struct GeneratedTests {
-    @Test func parse() throws {
+    @Test func properParse() throws {
         let service = FakeService()
-        let timeline: app.bsky.GetTimeline.Output =
+        let timeline: app.bsky.feed.GetTimeline.Output =
             try #require(try service.get(name: "Timeline.Output.1"))
         #expect(timeline.cursor == "abcd")
         try #require(timeline.feed.count == 1)
@@ -20,5 +20,15 @@ import Testing
             return
         }
         #expect(repost.by.displayName == "ItsEasyBeingGreen")
+    }
+
+    @Test func parseAtAll() throws {
+        let service = FakeService()
+        let tops = [1, 10, 97, 970]
+        for top in tops {
+            let timeline: app.bsky.feed.GetTimeline.Output =
+                try #require(try service.get(name: "top\(top)"))
+            #expect(timeline.feed.count == top)
+        }
     }
 }

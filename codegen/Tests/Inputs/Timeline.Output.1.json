@@ -26,7 +26,7 @@
         "uri": "at://did:plc:lyspo2bgxpznqtug5ir2q33g/app.bsky.feed.post/3ljkxbmga3s26"
       },
       "reason": {
-        "$type": "app.bsky.defs#reasonRepost",
+        "$type": "app.bsky.feed.defs#reasonRepost",
         "by": {
           "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:r2otjc5o7zdpwwiepysvg5qr/bafkreicvppt7czgc63nzvwhuhfoy4s2oets3ap2swxs2fwckcn4xofcm3e@jpeg",
           "createdAt": "2023-08-18T16:38:39.867Z",

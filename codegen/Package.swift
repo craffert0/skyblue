@@ -29,6 +29,10 @@ let package = Package(
             ],
             resources: [
                 .process("Inputs/Timeline.Output.1.json"),
+                .process("Inputs/top1.json"),
+                .process("Inputs/top10.json"),
+                .process("Inputs/top97.json"),
+                .process("Inputs/top970.json"),
             ],
         ),
     ]
