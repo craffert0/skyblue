@@ -1,5 +1,5 @@
 import Foundation
-import Schema
+import SkyBlueApi
 import Testing
 
 extension Nullable where T: Equatable {

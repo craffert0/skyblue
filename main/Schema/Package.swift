@@ -10,15 +10,27 @@ let package = Package(
     products: [
         .library(
             name: "Schema",
-            targets: ["Schema"]
+            targets: ["Schema"],
         ),
     ],
+
+    dependencies: [
+        .package(path: "../SkyBlueApi"),
+    ],
+
     targets: [
         .target(
-            name: "Schema"),
+            name: "Schema",
+            dependencies: [
+                .product(name: "SkyBlueApi", package: "SkyBlueApi"),
+            ],
+        ),
         .testTarget(
             name: "SchemaTests",
-            dependencies: ["Schema"]
+            dependencies: [
+                "Schema",
+                .product(name: "SkyBlueApi", package: "SkyBlueApi"),
+            ],
         ),
     ]
 )

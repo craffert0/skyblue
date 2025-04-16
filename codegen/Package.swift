@@ -11,6 +11,7 @@ let package = Package(
     platforms: [.macOS(.v15)],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
+        .package(path: "../main/SkyBlueApi"),
     ],
     targets: [
         .executableTarget(
@@ -21,7 +22,10 @@ let package = Package(
         ),
         .testTarget(
             name: "tests",
-            dependencies: ["codegen"]
+            dependencies: [
+                "codegen",
+                .product(name: "SkyBlueApi", package: "SkyBlueApi"),
+            ]
         ),
     ]
 )

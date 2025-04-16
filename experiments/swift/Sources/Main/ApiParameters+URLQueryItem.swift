@@ -1,5 +1,8 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
+
 import Foundation
-import Schema
+import SkyBlueApi
 
 private enum StringOrInt: Codable {
     case string(String)
@@ -24,7 +27,7 @@ private enum StringOrInt: Codable {
     }
 }
 
-extension Schema.ApiParameters {
+extension SkyBlueApi.ApiParameters {
     func queryItems() throws -> [URLQueryItem] {
         try JSONDecoder()
             .decode([String: StringOrInt].self,

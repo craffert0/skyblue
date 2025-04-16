@@ -19,6 +19,7 @@ class File: Decodable {
     func emit() -> Data {
         let p = Printer(inNamespace: id)
         p.println("import Foundation")
+        p.println("import SkyBlueApi")
         p.newline()
 
         let ext = namespace.joined(separator: ".")

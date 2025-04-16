@@ -18,7 +18,20 @@ CODEGEN_FILES := $(shell find codegen/Sources -type f -name '*.swift') codegen/P
 $(CODEGEN_APP): $(CODEGEN_FILES)
 	cd codegen ; swift build --configuration release
 
-test_codegen:
+## Generate code from test_lexicon
+
+TEST_LEXICON_DIR := test_lexicon
+TEST_LEXICON_FILES := $(shell find $(TEST_LEXICON_DIR) -type f)
+
+TEST_GENERATION_DIR := codegen/Tests/Generated
+TEST_GENERATION_ENUM := $(TEST_GENERATION_DIR)/TopEnum.swift
+
+$(TEST_GENERATION_ENUM): $(CODEGEN_APP) $(TEST_LEXICON_FILES)
+	$(CODEGEN_APP) $(TEST_LEXICON_DIR) $(TEST_GENERATION_DIR)
+
+codegen: $(TEST_GENERATION_ENUM)
+
+test_codegen: $(TEST_GENERATION_ENUM)
 	cd codegen ; swift test
 
 ## Generate code from atproto
