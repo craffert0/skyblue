@@ -2,9 +2,9 @@
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 import Foundation
-import Schema
+import SkyBlueApi
 
-extension Schema.ApiProcedure11 {
+extension ApiProcedure11 {
     static func request(with input: Input,
                         auth: String? = nil) -> URLRequest
     {
@@ -31,7 +31,7 @@ extension Schema.ApiProcedure11 {
     }
 }
 
-extension Schema.ApiProcedure01 {
+extension ApiProcedure01 {
     static func request(auth: String? = nil) -> URLRequest {
         try! URLRequest(method: "POST",
                         URL(forBsky: apiPath),

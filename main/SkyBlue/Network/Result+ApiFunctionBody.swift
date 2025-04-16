@@ -2,7 +2,7 @@
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 import Foundation
-import Schema
+import SkyBlueApi
 
 extension Result where Success: ApiFunctionBody, Failure == any Error {
     static func from(_ data: Data?, _ response: URLResponse?,

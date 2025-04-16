@@ -2,9 +2,9 @@
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 import Foundation
-import Schema
+import SkyBlueApi
 
-extension Schema.ApiQuery {
+extension ApiQuery {
     static func request(auth: String,
                         with params: Parameters? = nil) -> URLRequest
     {

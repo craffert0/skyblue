@@ -2,7 +2,7 @@
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 import Foundation
-import Schema
+import SkyBlueApi
 
 extension URLSession {
     func resultTask<Output: ApiFunctionBody>(

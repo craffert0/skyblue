@@ -2,14 +2,16 @@
 // Copyright (C) 2025 Colin Rafferty <colin@rafferty.net>
 
 import Foundation
-import Schema
+import SkyBlueApi
 
 extension URL {
     init(forBsky path: String) {
         self.init(string: "https://bsky.social/xrpc/\(path)")!
     }
 
-    init(forBsky path: String, with params: (some Schema.ApiParameters)?) throws {
+    init(forBsky path: String,
+         with params: (some ApiParameters)?) throws
+    {
         self.init(forBsky: path)
         if let params {
             try append(queryItems: params.queryItems())
