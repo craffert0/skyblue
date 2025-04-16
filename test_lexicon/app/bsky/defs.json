@@ -36,6 +36,31 @@
         },
         "createdAt": { "type": "string", "format": "datetime" }
       }
-    }
+    },
+    "feedViewPost": {
+      "type": "object",
+      "required": ["post"],
+      "properties": {
+        "post": { "type": "ref", "ref": "#postView" },
+        "reason": { "type": "union", "refs": ["#reasonRepost", "#reasonPin"] },
+        "feedContext": {
+          "type": "string",
+          "description": "Context provided by feed generator that may be passed back alongside interactions.",
+          "maxLength": 2000
+        }
+      }
+    },
+    "reasonRepost": {
+      "type": "object",
+      "required": ["by", "indexedAt"],
+      "properties": {
+        "by": { "type": "ref", "ref": "#profileViewBasic" },
+        "indexedAt": { "type": "string", "format": "datetime" }
+      }
+    },
+    "reasonPin": {
+      "type": "object",
+      "properties": {}
+    },
   }
 }

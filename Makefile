@@ -5,7 +5,7 @@
 
 all: test experiments top
 
-test: test_experiments test_codegen test_schema
+test: test_experiments test_codegen test_schema test_skyblueapi
 
 lint:
 	tools/reformat.py
@@ -45,6 +45,9 @@ $(GENERATION_ENUM): $(CODEGEN_APP)
 	$(CODEGEN_APP) $(LEXICON_DIR) $(GENERATION_DIR)
 
 codegen: $(GENERATION_ENUM)
+
+test_skyblueapi:
+	cd main/SkyBlueApi ; swift test
 
 ## Test the Schema 
 
