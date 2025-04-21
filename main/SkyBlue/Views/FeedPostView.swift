@@ -18,6 +18,7 @@ struct FeedViewPostView: View {
     typealias FeedViewPost = app.bsky.feed.defs.FeedViewPost
 
     @State var feed_post: FeedViewPost
+    @State var now = TimeDataSource<Date>.currentDate
 
     init(_ feed_post: FeedViewPost) {
         self.feed_post = feed_post
@@ -26,7 +27,10 @@ struct FeedViewPostView: View {
     var body: some View {
         VStack {
             HStack {
-                Text(feed_post.post.indexedAt.relative())
+                Text(now,
+                     format: DateFormatStyleRelative(
+                         to: feed_post.post.indexedAt
+                     ))
                 Text(feed_post.post.author.my_name)
             }
             if let feedContext = feed_post.feedContext {
